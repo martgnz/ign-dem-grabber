@@ -13,7 +13,8 @@ function main {
   local series=${1:-"MDT02"}
   local page=${2:-1}
 
-  echo "series,id,name,page"
+  # only print csv header on page 1
+  [[ $page -eq 1 ]] && echo "series,id,name,page"
   while true; do
     { cnig-list $series $page | grep -E 'secGeo|nombreGeo' | python -c "$(cat << EOF
 import sys
