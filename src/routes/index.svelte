@@ -92,7 +92,7 @@ const options = [
 				method="post"
 				id="form"
 				action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
-				<input type="hidden" name="secuencialDescDir" bind:value={$tile} />
+				<input type="hidden" name="secuencialDescDir" bind:value={$tile.id} />
 				<input type="hidden" name="aceptCodsLicsDD_0" value="15" />
 				<button type="submit">Descarga</button>
 			</form>

@@ -63,6 +63,7 @@ $: height = 650 - margin.top - margin.bottom;
 $: if (browser && dem) {
 	fetchData();
 	hover = null;
+	tile.set(null);
 }
 
 $: if (browser && geoPath) {
@@ -71,14 +72,13 @@ $: if (browser && geoPath) {
 }
 
 const mousemoved = (e, d) => {
-	mx = pointer(e)[0];
-	my = pointer(e)[1];
 	hover = d;
 };
 
-const clicked = (d) => {
-	console.log(d);
-	tile.set(d.properties.FICHERO);
+const clicked = (e, d) => {
+	tile.set({ path: d, id: d.properties.id, file: d.properties.file, date: d.properties.date });
+	mx = pointer(e)[0];
+	my = pointer(e)[1];
 };
 </script>
 
@@ -88,14 +88,22 @@ const clicked = (d) => {
 			{#if es}
 				{#each es.features as feature}
 					<path
-						on:mousemove={(e) => ($tile ? null : mousemoved(e, feature))}
-						on:click={() => clicked(feature)}
+						on:mousemove={(e) => mousemoved(e, feature)}
+						on:click={(e) => clicked(e, feature)}
 						fill="#d3d3d3"
 						stroke="black"
 						stroke-width={0.25}
 						d={path(feature)} />
 				{/each}
 				<path fill="none" stroke="black" d={projection.getCompositionBorders()} />
+				{#if $tile}
+					<path
+						d={path($tile.path)}
+						stroke-width={2}
+						stroke="black"
+						fill={'red'}
+						pointer-events="none" />
+				{/if}
 				<path
 					d={path(hover)}
 					stroke-width={2}
@@ -106,10 +114,10 @@ const clicked = (d) => {
 		</g>
 	</svg>
 
-	{#if hover}
+	{#if $tile}
 		<div class="tooltip" style="left:{mx - 50}px;top:{my - 80}px">
-			<div>{hover.properties.FICHERO}</div>
-			<div>{hover.properties.FECHA}</div>
+			<div>{$tile.file}</div>
+			<div>{$tile.date}</div>
 		</div>
 	{/if}
 </div>
