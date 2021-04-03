@@ -50,5 +50,6 @@ function inf {
 
 hash python &> /dev/null || { hash python3 &> /dev/null && shopt -s expand_aliases && alias python=python3 ; } || err "[!] this script requires python 3"
 python -c 'import lxml.html' &> /dev/null || err "[!] lxml not found (pip install lxml)"
+hash curl &> /dev/null || err "[!] curl not found"
 
 main "$@"
