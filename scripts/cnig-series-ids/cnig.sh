@@ -27,6 +27,9 @@ names = html.xpath('//input[contains(@id, "nombreGeo")]/@value')
 ids = html.xpath('//input[contains(@id, "secGeo")]/@value')
 assert(len(names) == len(ids))
 for _id, name in zip(names, ids):
+    split = _id.split('.')
+    _id = split[0] + '.' + split[1].lower()
+
     writer.writerow(["$series", name, _id, "$page"])
 EOF
     )" ; } || break
