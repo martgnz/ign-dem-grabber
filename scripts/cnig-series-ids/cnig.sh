@@ -48,6 +48,7 @@ function inf {
     || >&2 echo -e "$*"
 }
 
+hash python &> /dev/null || { hash python3 &> /dev/null && shopt -s expand_aliases && alias python=python3 ; } || err "[!] this script requires python 3"
 python -c 'import lxml.html' &> /dev/null || err "[!] lxml not found (pip install lxml)"
 
 main "$@"
