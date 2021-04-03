@@ -33,6 +33,7 @@ footer {
 
 <script>
 import Map from '$lib/Map.svelte';
+import { tile } from '../stores.js';
 
 let dem = 'MDT05';
 
@@ -85,6 +86,17 @@ const options = [
 				</div>
 			{/each}
 		</div>
+
+		{#if $tile}
+			<form
+				method="post"
+				id="form"
+				action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
+				<input type="hidden" name="secuencialDescDir" bind:value={$tile} />
+				<input type="hidden" name="aceptCodsLicsDD_0" value="15" />
+				<button type="submit">Descarga</button>
+			</form>
+		{/if}
 	</header>
 
 	<div class="content">

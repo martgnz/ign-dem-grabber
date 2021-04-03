@@ -25,10 +25,8 @@ import { onMount } from 'svelte';
 import { json } from 'd3-fetch';
 import { feature } from 'topojson-client';
 import { geoConicConformalSpain } from 'd3-composite-projections';
-import { saveAs } from 'file-saver';
 import { browser } from '$app/env';
-
-import formatBytes from './formatBytes';
+import { tile } from '../stores';
 
 export let dem;
 
@@ -42,7 +40,6 @@ let click;
 let mx;
 let my;
 let pointer;
-let receivedLength;
 
 // fetch topojson
 const fetchData = () => json(`${dem}.json`).then((data) => (es = feature(data, data.objects.dem)));
@@ -80,40 +77,8 @@ const mousemoved = (e, d) => {
 };
 
 const clicked = (d) => {
-	click = d;
-};
-
-const download = async (d) => {
-	// https://javascript.info/fetch-progress
-	let response = await fetch(
-		'https://cors-anywhere.herokuapp.com/https://centrodedescargas.cnig.es/CentroDescargas/descargaDir',
-		{
-			// body: 'secuencialDescDir=10323899&aceptCodsLicsDD_0=15',
-			body: 'secuencialDescDir=9000029&aceptCodsLicsDD_0=15',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			method: 'POST'
-		}
-	);
-
-	const reader = response.body.getReader();
-	receivedLength = 0;
-	let chunks = [];
-
-	while (true) {
-		const { done, value } = await reader.read();
-
-		if (done) {
-			break;
-		}
-
-		chunks.push(value);
-		receivedLength += value.length;
-	}
-
-	let blob = new Blob(chunks);
-	saveAs(blob, 'file.zip');
+	console.log(d);
+	tile.set(d.properties.FICHERO);
 };
 </script>
 
@@ -123,7 +88,7 @@ const download = async (d) => {
 			{#if es}
 				{#each es.features as feature}
 					<path
-						on:mousemove={(e) => (click ? null : mousemoved(e, feature))}
+						on:mousemove={(e) => ($tile ? null : mousemoved(e, feature))}
 						on:click={() => clicked(feature)}
 						fill="#d3d3d3"
 						stroke="black"
@@ -145,11 +110,6 @@ const download = async (d) => {
 		<div class="tooltip" style="left:{mx - 50}px;top:{my - 80}px">
 			<div>{hover.properties.FICHERO}</div>
 			<div>{hover.properties.FECHA}</div>
-
-			{#if receivedLength}
-				<div>{formatBytes(receivedLength)}</div>
-			{/if}
-			<button type="button" on:click={download}>Download</button>
 		</div>
 	{/if}
 </div>

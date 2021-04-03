@@ -12,8 +12,6 @@
 	"devDependencies": {
 		"@sveltejs/adapter-node": "next",
 		"@sveltejs/kit": "next",
-		"d3-composite-projections": "^1.4.0",
-		"d3-geo-projection": "^3.0.0",
 		"eslint": "^7.22.0",
 		"eslint-config-prettier": "^8.1.0",
 		"eslint-plugin-svelte3": "^3.1.0",
@@ -22,17 +20,17 @@
 		"prettier-plugin-svelte": "^2.2.0",
 		"shapefile": "^0.6.6",
 		"svelte": "^3.29.0",
-		"topojson-client": "^3.1.0",
 		"topojson-server": "^3.0.1",
 		"topojson-simplify": "^3.0.3",
 		"vite": "^2.1.0"
 	},
 	"type": "module",
 	"dependencies": {
+		"d3-composite-projections": "^1.4.0",
 		"d3-fetch": "^2.0.0",
 		"d3-geo": "^2.0.1",
+		"d3-geo-projection": "^3.0.0",
 		"d3-selection": "^2.0.0",
-		"file-saver": "^2.0.5",
-		"query-string": "^7.0.0"
+		"topojson-client": "^3.1.0"
 	}
 }
