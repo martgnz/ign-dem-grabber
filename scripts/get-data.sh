@@ -5,7 +5,14 @@ wget -O scripts/data/MDT05_recursos.zip https://centrodedescargas.cnig.es/Centro
 unzip -jod scripts/data scripts/data/MDT05_recursos.zip MDT05.\* 
 
 convert() {
-  mapshaper scripts/data/$1.shp -clean -rename-layers dem -proj wgs84 -o static/$2.json format=topojson
+  mapshaper scripts/data/$1.shp \
+    -clean \
+    -rename-layers dem \
+    -proj wgs84 \
+    -rename-fields file=$3,date=$4 \
+    -each "$5" \
+    -join scripts/cnig-series-ids/$2.csv keys=file,name string-fields=id fields=id   \
+    -o static/$2.json format=topojson
 
   # geo2topo -n dem=<( \
   #     shp2json --encoding utf8 -n scripts/data/${1}.shp \
@@ -15,5 +22,5 @@ convert() {
   #   > static/$2.json
 }
 
-convert MDT02_COB2_Fechas MDT02
-convert MDT05 MDT05
+convert MDT02_COB2_Fechas MDT02 Fichero Fecha ""
+convert MDT05 MDT05 FICHERO FECHA 'file=file.replace(/_/g, "-")'
