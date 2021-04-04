@@ -1,6 +1,9 @@
 <style>
-.container {
-	position: relative;
+#map {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 100%;
 }
 .tooltip {
 	padding: 8px;
@@ -21,103 +24,163 @@ button {
 </style>
 
 <script>
+import 'maplibre-gl/dist/maplibre-gl.css';
+
 import { onMount } from 'svelte';
 import { json } from 'd3-fetch';
 import { feature } from 'topojson-client';
-import { geoConicConformalSpain } from 'd3-composite-projections';
+import { Map, AttributionControl, Popup, LngLatBounds, LngLat } from 'maplibre-gl';
 import { browser } from '$app/env';
 import { tile } from '../stores';
 
 export let dem;
 
 let container;
-let geoPath;
-let projection;
-let es;
-let path;
-let hover;
-let click;
-let mx;
-let my;
+let map;
+let popup;
 let pointer;
 
 // fetch topojson
-const fetchData = () => json(`${dem}.json`).then((data) => (es = feature(data, data.objects.dem)));
+const fetchData = () => json(`${dem}.json`);
 
 onMount(async () => {
-	// https://kit.svelte.dev/docs#configuration-ssr
-	const d3Geo = await import('d3-geo');
-	geoPath = d3Geo.geoPath;
+	// use retina tiles if dpi > 1
+	const retina = window.devicePixelRatio > 1 ? '@2' : '';
 
-	const d3Selection = await import('d3-selection');
-	pointer = d3Selection.pointer;
+	// start map
+	map = new Map({
+		container: 'map',
+		center: [-6, 40],
+		zoom: 5.75,
+		maxZoom: 10,
+		// bounds
+		style: {
+			version: 8,
+			sources: {
+				tiles: {
+					type: 'raster',
+					tiles: [
+						`https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}${retina}.png`,
+						`https://b.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}${retina}.png`
+					],
+					tileSize: 256
+				}
+			},
+			layers: [
+				{
+					id: 'tiles',
+					type: 'raster',
+					source: 'tiles'
+				}
+			]
+		}
+	});
 
-	fetchData();
+	map.dragRotate.disable();
+	map.addControl(
+		new AttributionControl({
+			customAttribution:
+				'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">CNIG</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
+		})
+	);
+
+	// add our tiles
+	map.on('load', () => {
+		fetchData().then((data) => {
+			const grid = feature(data, data.objects.dem);
+
+			map.addSource('dem', {
+				type: 'geojson',
+				data: grid
+			});
+
+			map.addLayer({
+				id: 'dem',
+				type: 'fill',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'fill-color': 'rgba(0,0,0,.05)',
+					'fill-outline-color': 'rgba(0,0,0,.1)'
+				}
+			});
+
+			map.addLayer({
+				id: 'dem-clicked',
+				type: 'fill',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'fill-color': 'rgba(244, 244, 150, 0.5)',
+					'fill-outline-color': 'rgba(0,0,0,.5)'
+				},
+				filter: ['==', 'id', '']
+			});
+
+			map.addLayer({
+				id: 'dem-hover',
+				type: 'line',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'line-color': '#555',
+					'line-width': 2.5
+				},
+				filter: ['==', 'id', '']
+			});
+		});
+	});
+
+	// create a popup, but don't add it to the map yet.
+	popup = new Popup({
+		closeButton: false,
+		closeOnClick: false,
+		offset: 15
+	});
+
+	// hover
+	map.on('click', 'dem', clicked);
+	map.on('mousemove', 'dem', mousemoved);
+	map.on('mouseleave', 'dem', mouseleft);
 });
 
-const margin = { top: 20, right: 10, bottom: 10, left: 10 };
+const clicked = (e) => {
+	const { id, file, date } = e.features[0].properties;
 
-$: width = container ? container.getBoundingClientRect().width - margin.left - margin.right : 300;
-$: height = 650 - margin.top - margin.bottom;
+	console.log(e.features[0].properties);
 
-$: if (browser && dem) {
-	fetchData();
-	hover = null;
-	tile.set(null);
-}
-
-$: if (browser && geoPath) {
-	projection = geoConicConformalSpain().fitSize([width, height], es);
-	path = geoPath().projection(projection);
-}
-
-const mousemoved = (e, d) => {
-	hover = d;
+	map.setFilter('dem-clicked', ['==', 'id', id]);
+	popup
+		.setLngLat(e.lngLat)
+		.setHTML(
+			`<div class="tip-container">
+			<div>${file}</div>
+			<div>${date}</div>
+			<div>${id}</div>
+		</div>`
+		)
+		.addTo(map);
 };
 
-const clicked = (e, d) => {
-	tile.set({ path: d, id: d.properties.id, file: d.properties.file, date: d.properties.date });
-	mx = pointer(e)[0];
-	my = pointer(e)[1];
+const mousemoved = (e) => {
+	const id = e.features[0].properties.id;
+	map.setFilter('dem-hover', ['==', 'id', id]);
 };
+
+const mouseleft = (e) => {
+	map.setFilter('dem-hover', ['==', 'id', '']);
+};
+
+// update the grid
+// FIXME: this is not great
+$: if (browser && map && map.getSource('dem') && dem) {
+	fetchData().then((data) => {
+		const grid = feature(data, data.objects.dem);
+
+		popup.remove();
+		map.getSource('dem').setData(grid);
+	});
+}
 </script>
 
-<div class="container" bind:this={container}>
-	<svg width={width + margin.right + margin.left} height={height + margin.top + margin.bottom}>
-		<g transform="translate({margin.left},{margin.top})">
-			{#if es}
-				{#each es.features as feature}
-					<path
-						on:mousemove={(e) => mousemoved(e, feature)}
-						on:click={(e) => clicked(e, feature)}
-						fill="#d3d3d3"
-						stroke="black"
-						stroke-width={0.25}
-						d={path(feature)} />
-				{/each}
-				<path fill="none" stroke="black" d={projection.getCompositionBorders()} />
-				{#if $tile}
-					<path
-						d={path($tile.path)}
-						stroke-width={2}
-						stroke="black"
-						fill={'red'}
-						pointer-events="none" />
-				{/if}
-				<path
-					d={path(hover)}
-					stroke-width={2}
-					stroke="black"
-					fill={'yellow'}
-					pointer-events="none" />
-			{/if}
-		</g>
-	</svg>
-
-	{#if $tile}
-		<div class="tooltip" style="left:{mx - 50}px;top:{my - 80}px">
-			<div>{$tile.file}</div>
-			<div>{$tile.date}</div>
-		</div>
-	{/if}
-</div>
+<div id="map" bind:this={container} />
