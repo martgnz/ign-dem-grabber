@@ -37,22 +37,38 @@ function main {
   while true; do
     inf "[+] Extracting $series, page $page"
     { cnig-list $series $page | grep -E 'secGeo|nombreGeo' | python <(cat << EOF
-import sys
 import csv
+import sys
 import lxml.html
 
-html = lxml.html.fromstring(sys.stdin.read())
+import collections
+import itertools as it
+import functools as fun
 
-writer = csv.writer(sys.stdout)
+def rtl_compose(fns):
+    return fun.reduce(lambda f, g: lambda x: g(f(x)), fns, lambda x: x)
 
-names = html.xpath('//input[contains(@id, "nombreGeo")]/@value')
-ids = html.xpath('//input[contains(@id, "secGeo")]/@value')
-assert(len(names) == len(ids))
-for _id, name in zip(names, ids):
-    split = _id.split('.')
-    _id = split[0] + '.' + split[1].lower()
+def map_compose(fns, data, rtl=True):
+    return map(rtl_compose(fns if rtl else reversed(fns)), data)
 
-    writer.writerow(["$series", name, _id, "$page"])
+def extract(data):
+    html = lxml.html.fromstring(data)
+    uids = html.xpath('//input[contains(@id, "secGeo")]/@value')
+    names = html.xpath('//input[contains(@id, "nombreGeo")]/@value')
+
+    names = map_compose((
+      lambda name: name.rpartition('.'),
+      # assumedly tuple unpacking is evil, thanks python
+      lambda c: f'{ c[0] }.{ c[2].lower() }',
+    ), names)
+
+    return zip(it.repeat("$series"), names, uids, it.repeat("$page"))
+
+if __name__ == "__main__":
+    writer = csv.writer(sys.stdout)
+    rows = extract(sys.stdin.read())
+    collections.deque(map(writer.writerow, rows), maxlen=0)
+
 EOF
     ) ; } 2> /dev/null ; pipe=("${PIPESTATUS[@]}")
 
