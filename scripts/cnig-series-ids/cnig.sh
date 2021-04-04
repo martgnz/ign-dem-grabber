@@ -49,9 +49,10 @@ def extract(data):
     names = html.xpath('//input[contains(@id, "nombreGeo")]/@value')
 
     names = map_compose((
-      lambda name: name.rpartition('.'),
+      lambda name: name.partition('.'),
       # assumedly tuple unpacking is evil, thanks python
-      lambda c: f'{ c[0] }.{ c[2].lower() }',
+      lambda c: (c[0], c[1], c[2].lower()),
+      lambda c: ''.join(c),
     ), names)
 
     return zip(it.repeat("$series"), names, uids, it.repeat("$page"))
