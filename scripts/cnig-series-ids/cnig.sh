@@ -107,27 +107,25 @@ EOF
 
       log:warn "[!] curl failed $backoff_retries time(s), retrying in:"
       backoff:wait log:upd '%ds'
-
-    # HTTP 200 -> grep failed = empty -> breakdance
-    elif [[ ${pipe[1]} -gt 0 ]]; then
-
-      log:status:upd 0 "[+]"
-      log:upd "(empty)"
-
-      break
-
-    # All good
-    else
-      ((page+=1))
-      log:status:upd 0 "[+]"
-
-      backoff:init $base_wait
-      log:warn '[-] wait'
-      backoff:wait log:upd '%ds'
+      log:rst
+      continue
     fi
+
+    log:status:upd 0 "[+]"
+
+    # HTTP 200 -> grep failed -> empty -> end
+    if [[ ${pipe[1]} -gt 0 ]]; then
+      log:upd "(empty)"
+      break
+    fi
+
+    backoff:init $base_wait
+    log:warn '[-] wait'
+    backoff:wait log:upd '%ds'
 
     log:rst
 
+    ((page+=1))
   done
 
   log:inf "[+] all done!"
