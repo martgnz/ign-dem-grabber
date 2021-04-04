@@ -119,8 +119,10 @@ const options = [
 
 		<div class="info">
 			<p>
-				Datos en formato ASC con <a
-					href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
+				Datos en <a href="https://gdal.org/drivers/raster/aaigrid.html#raster-aaigrid"
+					>formato ASC</a>
+				con
+				<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
 					>licencia CC-BY</a
 				>.
 			</p>
