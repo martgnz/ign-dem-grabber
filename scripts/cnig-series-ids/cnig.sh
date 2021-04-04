@@ -35,6 +35,15 @@ function backoff:incr {
   [[ -n $2 ]] && [[ $backoff_interval -gt $2 ]] && backoff_interval=$2
 
   return 0
+
+function python {
+  if hash python3 &> /dev/null; then
+    command python3 "$@"
+  elif hash python &> /dev/null; then
+    command python "$@"
+  else
+    err "[!] this script requires python"
+  fi
 }
 
 # cnig-list MDT02 1
@@ -133,7 +142,7 @@ EOF
   log:inf "[+] all done!"
 }
 
-hash python &> /dev/null || { hash python3 &> /dev/null && shopt -s expand_aliases && alias python=python3 ; } || log:err "[!] this script requires python 3"
+
 python -c 'import lxml.html' &> /dev/null || log:err "[!] lxml not found (pip install lxml)"
 hash curl &> /dev/null || log:err "[!] curl not found"
 
