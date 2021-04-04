@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source $(dirname "$(realpath "$0")")/lib.sh
+source lib.sh
 
 function python {
   if hash python3 &> /dev/null; then
