@@ -1,33 +1,58 @@
 <style>
-main {
-	display: grid;
-	grid-template-columns: 40% 1fr;
-	grid-column-gap: 1rem;
-	margin-bottom: 2rem;
-}
 header {
-	max-width: 500px;
+	top: 2rem;
+	left: 2rem;
+	padding: 1rem;
+	position: absolute;
+	background: rgba(255, 255, 255, 0.9);
+	border-radius: 4px;
+	max-width: 285px;
+	z-index: 1;
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
 }
 h1 {
 	color: #111;
-	font-size: 1.5rem;
+	font-size: 1.25rem;
+	line-height: 1.2;
+	margin-top: 0;
 	margin-bottom: 0.5rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid #dfdfdf;
 }
 h2 {
 	font-size: 1rem;
 	margin: 0;
 	margin-bottom: 0.5rem;
 }
+a {
+	color: black;
+	/* text-decoration: none; */
+	/* border-bottom: 2px solid black; */
+}
+.radio {
+	position: relative;
+}
 .radio:not(:last-child) {
-	margin-bottom: 1rem;
+	margin-bottom: 0.5rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid #dfdfdf;
+}
+.note {
+	position: absolute;
+	right: 0;
+	top: 0;
+	font-size: 12px;
+	font-weight: 300;
+	font-style: italic;
 }
 .options {
-	margin-top: 1.5rem;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
-footer {
-	font-size: 0.85rem;
-	padding-top: 0.5rem;
-	border-top: 1px solid #dfdfdf;
+.info p {
+	font-weight: 300;
+	font-size: 12px;
+	margin-bottom: 2px;
 }
 </style>
 
@@ -40,49 +65,43 @@ let dem = 'MDT05';
 const options = [
 	{
 		value: 'MDT02',
-		text: '2m - la más detallada, no cubre todo el territorio'
+		text: '2 metros',
+		note: 'Cobertura incompleta'
 	},
 	{
 		value: 'MDT05',
-		text: '5m - detalle alto, para ciudades medias'
+		text: '5 metros'
 	},
 	{
 		value: 'MDT25',
-		text: '25m - detalle medio, para grandes ciudades'
+		text: '25 metros'
 	},
 	{
 		value: 'MDT200',
-		text: '200m - detalle bajo, para regiones'
+		text: '200 metros'
 	}
 ];
 </script>
 
 <main>
 	<header>
-		<h1>Modelos digitales de elevación</h1>
+		<h1>Descarga modelos digitales <br /> de elevación</h1>
 		<p>
-			Descarga los modelos digitales de elevación (DEM) del <a
-				href="http://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
-				>Centro Nacional de Información Geográfica</a> de manera sencilla en diferentes resoluciones.
-		</p>
-
-		<p>
-			Los archivos están en formato <code>asc</code>, para convertirlos a TIF con GDAL puedes hacer:
-		</p>
-		<p><code><span class="no-select">$ </span>gdalwarp output.tif input.asc</code></p>
-
-		<p>
-			En <a href="https://github.com/dwtkns/gdal-cheat-sheet#raster-operations">esta guía</a> hay más
-			comandos útiles.
+			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
+			por el <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
+				>Centro Nacional de Información Geográfica</a> a partir de datos LIDAR.
 		</p>
 
 		<div class="options">
-			<h2>Resoluciones</h2>
+			<h2>Escoge la resolución</h2>
 
 			{#each options as option}
 				<div class="radio">
 					<input type="radio" name="dem" id={option.value} value={option.value} bind:group={dem} />
 					<label for={option.value}>{option.text}</label>
+					{#if option.note}
+						<div class="note">{option.note}</div>
+					{/if}
 				</div>
 			{/each}
 		</div>
@@ -97,14 +116,27 @@ const options = [
 				<button type="submit">Descarga</button>
 			</form>
 		{/if}
+
+		<div class="info">
+			<p>
+				Datos en formato ASC con <a
+					href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
+					>licencia CC-BY</a
+				>.
+			</p>
+			<p>
+				<a href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/{dem}_recursos.zip"
+					>Descarga la referencia técnica</a
+				>.
+			</p>
+			<p>
+				Código fuente disponible en <a href="https://github.com/martgnz/cnig-dem-grabber">GitHub</a
+				>.
+			</p>
+		</div>
 	</header>
 
 	<div class="content">
 		<Map {dem} />
 	</div>
 </main>
-<footer>
-	Fuente: <a href="http://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
-		>Centro Nacional de Información Geográfica.
-	</a>
-</footer>
