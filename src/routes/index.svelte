@@ -30,6 +30,8 @@ a {
 	/* border-bottom: 2px solid black; */
 }
 .radio {
+	display: flex;
+	align-items: baseline;
 	position: relative;
 }
 .radio:not(:last-child) {
@@ -37,7 +39,11 @@ a {
 	padding-bottom: 0.5rem;
 	border-bottom: 1px solid #dfdfdf;
 }
+label {
+	width: 100%;
+}
 .note {
+	pointer-events: none;
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -120,7 +126,7 @@ const options = [
 		<div class="info">
 			<p>
 				Datos en <a href="https://gdal.org/drivers/raster/aaigrid.html#raster-aaigrid"
-					>formato ASC</a>
+					>formato ASCII Grid</a>
 				con
 				<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
 					>licencia CC-BY</a

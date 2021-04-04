@@ -38,7 +38,6 @@ export let dem;
 let container;
 let map;
 let popup;
-let pointer;
 
 // fetch topojson
 const fetchData = () => json(`${dem}.json`);
@@ -47,13 +46,19 @@ onMount(async () => {
 	// use retina tiles if dpi > 1
 	const retina = window.devicePixelRatio > 1 ? '@2' : '';
 
+	const bounds = [
+		[-21, 25],
+		[10, 45]
+	];
+
 	// start map
 	map = new Map({
 		container: 'map',
 		center: [-6, 40],
 		zoom: 5.75,
 		maxZoom: 10,
-		// bounds
+		minZoom: 5.75,
+		// maxBounds: bounds,
 		style: {
 			version: 8,
 			sources: {
@@ -101,7 +106,7 @@ onMount(async () => {
 				layout: {},
 				paint: {
 					'fill-color': 'rgba(0,0,0,.05)',
-					'fill-outline-color': 'rgba(0,0,0,.1)'
+					'fill-outline-color': 'rgba(0,0,0,.15)'
 				}
 			});
 
@@ -154,9 +159,15 @@ const clicked = (e) => {
 		.setLngLat(e.lngLat)
 		.setHTML(
 			`<div class="tip-container">
-			<div>${file}</div>
-			<div>${date}</div>
-			<div>${id}</div>
+				<div>${file}</div>
+				${date ? `<div>${date}</div>` : ''}
+				<form
+					method="post"
+					id="form"
+					action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
+					<input type="hidden" name="secuencialDescDir" value="${id}" />
+					<button type="submit">Descarga</button>
+				</form>
 		</div>`
 		)
 		.addTo(map);
