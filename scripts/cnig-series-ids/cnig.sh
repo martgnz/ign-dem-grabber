@@ -57,7 +57,7 @@ function main {
   backoff:init
 
   # only print csv header on page 1
-  [[ $page -eq 1 ]] && echo "series,id,name,page"
+  [[ $page -eq 1 ]] && echo "series,name,id,tile_id,page"
 
   while true; do
     log:inf "[-] extracting $series, page $page"
@@ -82,6 +82,10 @@ def extract(data):
     uids = html.xpath('//input[contains(@id, "secGeo")]/@value')
     names = html.xpath('//input[contains(@id, "nombreGeo")]/@value')
 
+    tile_ids = map_compose((
+      lambda name: name.split('-')[-2],
+    ), names)
+
     names = map_compose((
       lambda name: name.partition('.'),
       # assumedly tuple unpacking is evil, thanks python
@@ -89,7 +93,7 @@ def extract(data):
       lambda c: ''.join(c),
     ), names)
 
-    return zip(it.repeat("$series"), names, uids, it.repeat("$page"))
+    return zip(it.repeat("$series"), names, uids, tile_ids, it.repeat("$page"))
 
 if __name__ == "__main__":
     writer = csv.writer(sys.stdout)
