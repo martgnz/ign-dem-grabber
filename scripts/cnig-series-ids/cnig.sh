@@ -2,16 +2,6 @@
 
 source lib.sh
 
-function python {
-  if hash python3 &> /dev/null; then
-    command python3 "$@"
-  elif hash python &> /dev/null; then
-    command python "$@"
-  else
-    err "[!] this script requires python"
-  fi
-}
-
 # cnig-list MDT02 1
 function cnig-list {
   local series=$1
@@ -38,7 +28,7 @@ function main {
   while true; do
     log:inf "[-] extracting $series, page $page"
 
-    { cnig-list $series $page | grep -E 'secGeo|nombreGeo' | python <(cat << EOF
+    { cnig-list $series $page | grep -E 'secGeo|nombreGeo' | python3 <(cat << EOF
 import csv
 import sys
 import lxml.html
@@ -108,8 +98,8 @@ EOF
   log:inf "[+] all done!"
 }
 
-
-python -c 'import lxml.html' &> /dev/null || log:err "[!] lxml not found (pip install lxml)"
+hash python3 &> /dev/null || log:err "[!] this script requires python3"
+python3 -c 'import lxml.html' &> /dev/null || log:err "[!] lxml not found (pip install lxml)"
 hash curl &> /dev/null || log:err "[!] curl not found"
 
 main "$@"
