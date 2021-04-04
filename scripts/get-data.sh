@@ -33,6 +33,7 @@ convert_mdt25() {
     -rename-fields tile_id=MTN50_CLAS \
     -each 'tile_id=tile_id.replace(/\//g, "-")' \
     -join scripts/cnig-series-ids/MDT25.csv keys=tile_id,tile_id string-fields=tile_id fields=name,id   \
+    -rename-fields file=name \
     -o static/$1.json format=topojson
 }
 
