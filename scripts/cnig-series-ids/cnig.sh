@@ -3,11 +3,11 @@
 # logging
 COLORS=("\033[1;32m" "\033[1;34m" "\033[1;33m" "\033[1;31m")
 
-function log:inf  { >&2 printf "%b" "\n\033[1A" "${COLORS[1]}" "[+] " "\033[0m" "$@" "\033[s\n\033[u\033[1C"           ; }
-function log:warn { >&2 printf "%b" "\n\033[1A" "${COLORS[2]}" "[!] " "\033[0m" "$@" "\033[s\n\033[u\033[1C"           ; }
-function log:err  { >&2 printf "%b" "\n\033[1A" "${COLORS[3]}" "[!] " "\033[0m" "$@" "\033[s\n\033[u\033[1C" && exit 1 ; }
-function log:upd  { >&2 printf "%b"  "\033[u" "\033[0K" "$@"    "\n"  ; }
-function log:rst  { >&2 printf "%b"  "\033[u" "\033[0G" "\033[K"      ; }
+function log:inf  { >&2 printf "%b" "\n\033[1A" "${COLORS[1]}" "[+] " "\033[0m" "$@" "\033[s" "\n"           ; }
+function log:warn { >&2 printf "%b" "\n\033[1A" "${COLORS[2]}" "[!] " "\033[0m" "$@" "\033[s" "\n"           ; }
+function log:err  { >&2 printf "%b" "\n\033[1A" "${COLORS[3]}" "[!] " "\033[0m" "$@" "\033[s" "\n" && exit 1 ; }
+function log:upd  { >&2 printf "%b" "\033[u" "\033[0K" "$@" "\n" ; }
+function log:rst  { >&2 printf "%b" "\033[u" "\033[0G" "\033[K"  ; }
 
 # exponential backoff
 function backoff:init { backoff_retries=0 ; backoff_interval=${1:-0}; }
