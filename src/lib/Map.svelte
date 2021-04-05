@@ -5,21 +5,45 @@
 	bottom: 0;
 	width: 100%;
 }
-.tooltip {
-	padding: 8px;
-	background: white;
-	font-size: 14px;
-	border: 1px solid #000000;
-	position: absolute;
-	/* pointer-events: none; */
+:global(.mapboxgl-popup) {
+	width: 230px;
 }
-button {
-	cursor: pointer;
-	padding: 5px;
-	background: #fff;
+:global(.tip-title) {
+	font-weight: 700;
 	font-size: 14px;
-	border: 1px solid #222;
+	margin-bottom: 0.25rem;
+}
+:global(.tip-row) {
+	font-size: 14px;
+	display: flex;
+	justify-content: space-between;
+}
+:global(.tip-row:not(:last-of-type)) {
+	border-bottom: 1px solid #dfdfdf;
+	margin-bottom: 0.25rem;
+	padding-bottom: 0.25rem;
+}
+:global(.tip-name) {
+	color: #7d7d7d;
+}
+:global(#map form) {
+	text-align: center;
+	margin-top: 0.75rem;
+}
+:global(.tip-download) {
+	cursor: pointer;
+	width: 80%;
+	border: 1px solid #54851f;
 	border-radius: 4px;
+	background: #54851f;
+	font-weight: 700;
+	font-size: 14px;
+	color: #fff;
+	padding: 8px;
+	text-align: center;
+}
+:global(.tip-download:hover) {
+	background: #4e6e2c;
 }
 </style>
 
@@ -152,25 +176,40 @@ onMount(async () => {
 const clicked = (e) => {
 	const { id, file, date } = e.features[0].properties;
 
-	console.log(e.features[0].properties);
+	// FIXME: this should be smarter
+	const splitted = file.split('-');
+	const sheet = splitted[splitted.length - 2];
+	const utm = splitted[splitted.length - 3];
+	const datum = splitted[1];
 
 	map.setFilter('dem-clicked', ['==', 'id', id]);
 	popup
 		.setLngLat(e.lngLat)
 		.setHTML(
 			`<div class="tip-container">
-				<div>${file}</div>
-				${date ? `<div>${date}</div>` : ''}
+				<div class="tip-title">Hoja ${sheet}</div>
+				${tooltipRow({ name: 'Fecha', data: date })}
+				${tooltipRow({ name: 'UTM', data: utm })}
+				${tooltipRow({ name: 'Datum', data: datum })}
 				<form
 					method="post"
 					id="form"
 					action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
 					<input type="hidden" name="secuencialDescDir" value="${id}" />
-					<button type="submit">Descarga</button>
+					<button class="tip-download" type="submit">Descargar</button>
 				</form>
 		</div>`
 		)
 		.addTo(map);
+};
+
+const tooltipRow = ({ name, data }) => {
+	if (!data) return '';
+
+	return `<div class="tip-row">
+		<div class="tip-name">${name}</div>
+		<div class="tip-value">${data}</div>
+		</div>`;
 };
 
 const mousemoved = (e) => {
