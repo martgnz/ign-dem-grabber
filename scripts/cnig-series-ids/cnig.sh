@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 
 # logging
-_LOG_STATUS=("\033[1;32m" "\033[1;34m" "\033[1;33m" "\033[1;31m")
-function log:fmt {
-  [[ ${*:2:$#} =~ ^(\[.*\])(.*) ]] \
-    && printf "$1%b\033[0m%b" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
-    || printf "%b" "${*:2:$#}"
-}
-function log:inf  { >&2 log:fmt "${_LOG_STATUS[1]}" "$@" "\033[s" "\n"           ; }
-function log:warn { >&2 log:fmt "${_LOG_STATUS[2]}" "$@" "\033[s" "\n"           ; }
-function log:err  { >&2 log:fmt "${_LOG_STATUS[3]}" "$@" "\033[s" "\n" && exit 1 ; }
+COLORS=("\033[1;32m" "\033[1;34m" "\033[1;33m" "\033[1;31m")
+
+function log:inf  { >&2 printf "%b" "\n\033[1A" "${COLORS[1]}" "[+] " "\033[0m" "$@" "\033[s\n\033[u\033[1C"           ; }
+function log:warn { >&2 printf "%b" "\n\033[1A" "${COLORS[2]}" "[!] " "\033[0m" "$@" "\033[s\n\033[u\033[1C"           ; }
+function log:err  { >&2 printf "%b" "\n\033[1A" "${COLORS[3]}" "[!] " "\033[0m" "$@" "\033[s\n\033[u\033[1C" && exit 1 ; }
 function log:upd  { >&2 printf "%b"  "\033[u" "\033[0K" "$@"    "\n"  ; }
 function log:rst  { >&2 printf "%b"  "\033[u" "\033[0G" "\033[K"      ; }
-function log:status:upd { log:upd $(log:fmt "\033[u\033[0G${_LOG_STATUS[$1]}" "$2") ; }
 
 # exponential backoff
 function backoff:init { backoff_retries=0 ; backoff_interval=${1:-0}; }
@@ -45,7 +40,7 @@ function cnig-list {
   local series=$1
   local page=${2:-1}
   # XXX this curl could suck less
-  curl 'http://centrodedescargas.cnig.es/CentroDescargas/resultadosArchivos' --data-raw 'geom=None&coords=%7B%22type%22+%3A+%22FeatureCollection%22%2C+%22features%22+%3A+%5B%7B%22type%22%3A%22Feature%22%2C%22geometry%22%3A%7B%22type%22%3A+%22Polygon%22%2C%22coordinates%22%3A+%5B%5B%5B-180%2C-90%5D%2C%5B-180%2C84.1640960027031%5D%2C%5B180.122131343973%2C84.1640960027031%5D%2C%5B180.122131343973%2C-90%5D%2C%5B-180%2C-90%5D%5D%5D%7D%7D%5D%7D&numPagina='$page'&numTotalReg=2248&codSerie='$series'&series='$series'&codProvAv=&codIneAv=&codComAv=&numHojaAv=&todaEsp=&todoMundo=&tipoBusqueda=VI&tipoArchivo=&contiene=&subSerieExt=&codSubSerie=&idProcShape=' --fail 2> /dev/null
+  curl 'http://centrodedescargas.cnig.es/CentroDescargas/resultadosArchivos' --data-raw "geom=None&coords=%7B%22type%22+%3A+%22FeatureCollection%22%2C+%22features%22+%3A+%5B%7B%22type%22%3A%22Feature%22%2C%22geometry%22%3A%7B%22type%22%3A+%22Polygon%22%2C%22coordinates%22%3A+%5B%5B%5B-180%2C-90%5D%2C%5B-180%2C84.1640960027031%5D%2C%5B180.122131343973%2C84.1640960027031%5D%2C%5B180.122131343973%2C-90%5D%2C%5B-180%2C-90%5D%5D%5D%7D%7D%5D%7D&numPagina=$page&numTotalReg=2248&codSerie=$series&series=$series&codProvAv=&codIneAv=&codComAv=&numHojaAv=&todaEsp=&todoMundo=&tipoBusqueda=VI&tipoArchivo=&contiene=&subSerieExt=&codSubSerie=&idProcShape=" --fail 2> /dev/null
 }
 
 function cnig-ids {
@@ -64,9 +59,26 @@ function with-retry {
   while true; do
     "$@" && break
     backoff:incr $backoff_base $max_wait $max_retry || log:err "$1 failed $backoff_retries time(s), bye"
-    log:warn "[!] $1 failed $backoff_retries time(s), retrying in:"
+    log:warn "$1 failed $backoff_retries time(s), retrying in:"
     backoff:wait log:upd "%ds"
   done
+}
+
+function bar {
+  local val=$1
+  local bas=$2
+  local wid=$3
+  local txt=$4
+
+  [[ -z $wid ]] && [[ -n $txt ]] && wid=${#txt}
+
+  local per=$(( (wid * val) / bas ))
+
+  if [[ -n $txt ]]; then
+    printf "\033[7m${txt:0:$per}\033[27m${txt:$per:$((wid-per))}"
+  else
+    printf "\033[7m%*s\033[27m%*s" $per '' $((wid-per)) ''
+  fi
 }
 
 function main {
@@ -76,9 +88,9 @@ function main {
   # only print csv header on page 1
   [[ $page -eq 1 ]] && echo "series,filename,id,page"
 
-  while true; do
-    log:inf "[CNIG $series #$page -/-]"
+  local prompt="▏ cnig.es $series #%02d %02d|%02d ▕"
 
+  while true; do
     local ids=$(with-retry cnig-ids $series $page)
     local len=$(echo $ids | wc -w | awk '{ print $1 }')
 
@@ -87,6 +99,8 @@ function main {
     local i=1
     local filename
 
+    log:inf "${COLORS[1]}$(printf "$prompt" $page 1 $len)\033[0m"
+
     for id in $ids; do
       filename=$(with-retry cnig-filename $id)
       echo $series,$filename,$id,$page
@@ -94,12 +108,12 @@ function main {
       ((i+=1))
 
       log:rst
-      log:inf "[CNIG $series #$page $i/$len] $id -> $filename"
+
+      log:inf "${COLORS[1]}$(bar $i $len '' "$(printf "$prompt" $page $i $len)")\033[0m $id -> $filename"
     done
 
     ((page+=1))
 
-    log:rst
   done
 }
 
