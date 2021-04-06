@@ -49,13 +49,11 @@ convert_mdt200() {
     -drop target=autonomous_regions \
     -proj wgs84 \
     -drop fields=id \
-    -each 'name = name === "A Coruña" ? "A Coruna" : name === "Illes Balears" ? "Balears, Illes" : name === "Alacant/Alicante" ? "Alicante/Alacant" : name === "Araba/Álava" ? "Álava" : name' \
-    -join scripts/cnig-series-ids/MDT200.csv keys=name,name fields=id \
-    -rename-fields file=name \
+    -join scripts/cnig-cleaned-ids/MDT200.csv keys=name,name \
     -o static/$1.json format=topojson
 }
 
-convert MDT02_COB2_Fechas MDT02 Fichero Fecha ""
-convert MDT05 MDT05 FICHERO FECHA 'file=file.replace(/_/g, "-")'
-convert_mdt25 MDT25
+# convert MDT02_COB2_Fechas MDT02 Fichero Fecha ""
+# convert MDT05 MDT05 FICHERO FECHA 'file=file.replace(/_/g, "-")'
+# convert_mdt25 MDT25
 convert_mdt200 MDT200

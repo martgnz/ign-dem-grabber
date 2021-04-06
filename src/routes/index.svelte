@@ -95,7 +95,7 @@ const options = [
 		<p>
 			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
 			por el <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
-				>Centro Nacional de Información Geográfica</a> a partir de datos LIDAR.
+				>Instituto Geográfico Nacional</a> a partir de datos LIDAR.
 		</p>
 
 		<div class="options">

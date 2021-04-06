@@ -109,7 +109,7 @@ onMount(async () => {
 	map.addControl(
 		new AttributionControl({
 			customAttribution:
-				'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">CNIG</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
+				'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">IGN</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
 		})
 	);
 
@@ -174,23 +174,17 @@ onMount(async () => {
 });
 
 const clicked = (e) => {
-	const { id, file, date } = e.features[0].properties;
-
-	// FIXME: this should be smarter
-	const splitted = file.split('-');
-	const sheet = splitted[splitted.length - 2];
-	const utm = splitted[splitted.length - 3];
-	const datum = splitted[1];
+	const { id, name, datum, utm_zone, date } = e.features[0].properties;
 
 	map.setFilter('dem-clicked', ['==', 'id', id]);
 	popup
 		.setLngLat(e.lngLat)
 		.setHTML(
 			`<div class="tip-container">
-				<div class="tip-title">Hoja ${sheet}</div>
+				<div class="tip-title">${dem === 'MDT200' ? name : `Hoja ${name}`}</div>
 				${tooltipRow({ name: 'Fecha', data: date })}
-				${tooltipRow({ name: 'UTM', data: utm })}
 				${tooltipRow({ name: 'Datum', data: datum })}
+				${tooltipRow({ name: 'Zona UTM', data: utm_zone })}
 				<form
 					method="post"
 					id="form"
