@@ -176,6 +176,9 @@ onMount(async () => {
 const clicked = (e) => {
 	const { id, name, datum, utm_zone, date } = e.features[0].properties;
 
+	// some tiles don't have imagery
+	if (name === 'null') return;
+
 	map.setFilter('dem-clicked', ['==', 'id', id]);
 	popup
 		.setLngLat(e.lngLat)

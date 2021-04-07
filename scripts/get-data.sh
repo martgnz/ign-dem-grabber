@@ -18,14 +18,14 @@ if [ ! -f scripts/data/provinces.json ]; then
   wget -O scripts/data/provinces.json https://unpkg.com/es-atlas@0.4.0/es/provinces.json
 fi
 
-convert() {
+# FIXME: do many-to-many merges
+convert_mdt0205() {
   mapshaper scripts/data/$1.shp \
     -clean \
     -rename-layers dem \
     -proj wgs84 \
-    -rename-fields file=$3,date=$4 \
-    -each "$5" \
-    -join scripts/cnig-series-ids/$2.csv keys=file,name string-fields=id fields=id   \
+    -rename-fields filename=$3,date=$4 \
+    -join scripts/cnig-cleaned-ids/$2.csv keys=filename,filename string-fields=id   \
     -o static/$2.json format=topojson
 }
 
@@ -42,7 +42,6 @@ convert_mdt25() {
 }
 
 convert_mdt200() {
-  # FIXME: i know the replace is horrible but
   mapshaper scripts/data/provinces.json \
     -rename-layers dem=provinces \
     -drop target=autonomous_regions \
@@ -52,7 +51,7 @@ convert_mdt200() {
     -o static/$1.json format=topojson
 }
 
-# convert MDT02_COB2_Fechas MDT02 Fichero Fecha ""
-# convert MDT05 MDT05 FICHERO FECHA 'file=file.replace(/_/g, "-")'
+convert_mdt0205 MDT02_COB2_Fechas MDT02 Fichero Fecha
+convert_mdt0205 MDT05 MDT05 FICHERO FECHA
 convert_mdt25 MDT25
-# convert_mdt200 MDT200
+convert_mdt200 MDT200
