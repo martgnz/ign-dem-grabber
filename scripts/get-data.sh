@@ -35,10 +35,9 @@ convert_mdt25() {
     -rename-layers dem \
     -proj wgs84 \
     -drop fields=NOMBRE_50,CCFF50 \
-    -rename-fields tile_id=MTN50_CLAS \
-    -each 'tile_id=tile_id.replace(/\//g, "-")' \
-    -join scripts/cnig-series-ids/MDT25.csv keys=tile_id,tile_id string-fields=tile_id fields=name,id   \
-    -rename-fields file=name \
+    -rename-fields name=MTN50_CLAS \
+    -each 'name=name.replace(/\//g, "-")' \
+    -join scripts/cnig-cleaned-ids/MDT25.csv keys=name,name string-fields=name   \
     -o static/$1.json format=topojson
 }
 
@@ -55,5 +54,5 @@ convert_mdt200() {
 
 # convert MDT02_COB2_Fechas MDT02 Fichero Fecha ""
 # convert MDT05 MDT05 FICHERO FECHA 'file=file.replace(/_/g, "-")'
-# convert_mdt25 MDT25
-convert_mdt200 MDT200
+convert_mdt25 MDT25
+# convert_mdt200 MDT200

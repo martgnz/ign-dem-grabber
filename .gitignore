@@ -5,3 +5,4 @@ node_modules
 /functions
 scripts/data/*
 !scripts/data/.gitkeep
+.Rhistory
