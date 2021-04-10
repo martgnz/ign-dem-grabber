@@ -14,19 +14,19 @@ You need to have `R` installed and in your path.
 $ npm install
 ```
 
-2. Navigate to this folder and run this script to download the tiles:
-
-```bash
-$ ./download-maps.sh
-```
-
-3. Run the scraper to get metadata for each tile on every resolution:
+2. Navigate to this folder and run the scraper to get metadata for each tile on every resolution:
 
 ```bash
 $ ./scrape-data.sh
 ```
 
-4. Process the scraped data and generate clean CSVs:
+3. Run this script to download the tiles:
+
+```bash
+$ ./download-maps.sh
+```
+
+4. Process the scraped data and generate clean CSVs and shapefiles:
 
 ```bash
 $ Rscript clean-data.R
