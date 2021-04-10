@@ -126,8 +126,7 @@ const options = [
 				>.
 			</p>
 			<p>
-				Código fuente disponible en <a href="https://github.com/martgnz/cnig-dem-grabber">GitHub</a
-				>.
+				Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber">GitHub</a>.
 			</p>
 		</div>
 	</header>
