@@ -1,6 +1,6 @@
 # ign-dem-grabber
 
-# GDAL cheat sheet
+## GDAL cheat sheet
 
 **Merge rasters**
 
