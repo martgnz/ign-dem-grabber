@@ -5,7 +5,7 @@
 **Merge rasters**
 
 ```bash
-gdal_merge.py -o merged.tif input.asc
+gdal_merge.py -o merged.tif input1.asc input2.asc
 ```
 
 **Add geographic information**
