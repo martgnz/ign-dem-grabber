@@ -51,20 +51,20 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { onMount } from 'svelte';
-import { json } from 'd3-fetch';
+import { csv, json } from 'd3-fetch';
 import { feature } from 'topojson-client';
-import { Map, AttributionControl, Popup, LngLatBounds, LngLat } from 'maplibre-gl';
+import { Map, AttributionControl, Popup } from 'maplibre-gl';
 import { browser } from '$app/env';
-import { tile } from '../stores';
 
 export let dem;
 
 let container;
-let map;
+let geoMap;
+let data;
 let popup;
 
 // fetch topojson
-const fetchData = () => json(`${dem}.json`);
+const fetchData = () => Promise.all([json(`${dem}.json`), csv(`${dem}.csv`)]);
 
 onMount(async () => {
 	// use retina tiles if dpi > 1
@@ -76,7 +76,7 @@ onMount(async () => {
 	];
 
 	// start map
-	map = new Map({
+	geoMap = new Map({
 		container: 'map',
 		center: [-6, 40],
 		zoom: 5.75,
@@ -105,8 +105,8 @@ onMount(async () => {
 		}
 	});
 
-	map.dragRotate.disable();
-	map.addControl(
+	geoMap.dragRotate.disable();
+	geoMap.addControl(
 		new AttributionControl({
 			customAttribution:
 				'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">IGN</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
@@ -114,16 +114,17 @@ onMount(async () => {
 	);
 
 	// add our tiles
-	map.on('load', () => {
-		fetchData().then((data) => {
-			const grid = feature(data, data.objects.dem);
+	geoMap.on('load', () => {
+		fetchData().then(([es, csv]) => {
+			const grid = feature(es, es.objects.dem);
+			data = csv;
 
-			map.addSource('dem', {
+			geoMap.addSource('dem', {
 				type: 'geojson',
 				data: grid
 			});
 
-			map.addLayer({
+			geoMap.addLayer({
 				id: 'dem',
 				type: 'fill',
 				source: 'dem',
@@ -134,7 +135,7 @@ onMount(async () => {
 				}
 			});
 
-			map.addLayer({
+			geoMap.addLayer({
 				id: 'dem-clicked',
 				type: 'fill',
 				source: 'dem',
@@ -143,10 +144,10 @@ onMount(async () => {
 					'fill-color': 'rgba(244, 244, 150, 0.5)',
 					'fill-outline-color': 'rgba(0,0,0,.5)'
 				},
-				filter: ['==', 'id', '']
+				filter: ['==', 'name', '']
 			});
 
-			map.addLayer({
+			geoMap.addLayer({
 				id: 'dem-hover',
 				type: 'line',
 				source: 'dem',
@@ -155,7 +156,7 @@ onMount(async () => {
 					'line-color': '#555',
 					'line-width': 2.5
 				},
-				filter: ['==', 'id', '']
+				filter: ['==', 'name', '']
 			});
 		});
 	});
@@ -168,36 +169,66 @@ onMount(async () => {
 	});
 
 	// hover
-	map.on('click', 'dem', clicked);
-	map.on('mousemove', 'dem', mousemoved);
-	map.on('mouseleave', 'dem', mouseleft);
+	geoMap.on('click', 'dem', clicked);
+	geoMap.on('mousemove', 'dem', mousemoved);
+	geoMap.on('mouseleave', 'dem', mouseleft);
 });
 
+const mousemoved = (e) => {
+	const { name } = e.features[0].properties;
+
+	const datum = data.find((d) => d.name === name);
+	if (!datum) return;
+
+	const id = datum.name;
+	geoMap.setFilter('dem-hover', ['==', 'name', id]);
+};
+
+const mouseleft = (e) => {
+	geoMap.setFilter('dem-hover', ['==', 'name', '']);
+};
+
 const clicked = (e) => {
-	const { id, name, datum, utm_zone, date } = e.features[0].properties;
+	const { name, date } = e.features[0].properties;
+	const datum = data.filter((d) => d.name === name);
 
-	// some tiles don't have imagery
-	if (name === 'null') return;
+	if (!datum) return;
 
-	map.setFilter('dem-clicked', ['==', 'id', id]);
+	// we get the first match for the hover
+	const id = datum[0].name;
+	const isMultiple = datum.length > 1;
+
+	geoMap.setFilter('dem-clicked', ['==', 'id', id]);
 	popup
 		.setLngLat(e.lngLat)
 		.setHTML(
 			`<div class="tip-container">
-				<div class="tip-title">${dem === 'MDT200' ? name : `Hoja ${name}`}</div>
+				<div class="tip-title">${dem === 'MDT200' ? id : `Hoja ${datum[0].name}`}</div>
 				${tooltipRow({ name: 'Fecha', data: date })}
-				${tooltipRow({ name: 'Datum', data: datum })}
-				${tooltipRow({ name: 'Zona UTM', data: utm_zone })}
-				<form
-					method="post"
-					id="form"
-					action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
-					<input type="hidden" name="secuencialDescDir" value="${id}" />
-					<button class="tip-download" type="submit">Descargar</button>
-				</form>
+				${tooltipRow({ name: 'Datum', data: datum[0].datum })}
+				${tooltipRow({
+					name: `Zona${isMultiple ? 's' : ''} UTM`,
+					data: datum.map((d) => d.utm_zone).join(', ')
+				})}
+				${datum
+					.map(
+						(d) => `
+					<form
+						method="post"
+						id="form"
+						action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
+						<input type="hidden" name="secuencialDescDir" value="${d.id}" />
+						<button class="tip-download" type="submit">Descargar ${
+							isMultiple ? `UTM ${d.utm_zone}` : ''
+						}</button>
+					</form>
+				`
+					)
+					.join('')}
+			
 		</div>`
 		)
-		.addTo(map);
+		.addTo(geoMap);
 };
 
 const tooltipRow = ({ name, data }) => {
@@ -209,23 +240,15 @@ const tooltipRow = ({ name, data }) => {
 		</div>`;
 };
 
-const mousemoved = (e) => {
-	const id = e.features[0].properties.id;
-	map.setFilter('dem-hover', ['==', 'id', id]);
-};
-
-const mouseleft = (e) => {
-	map.setFilter('dem-hover', ['==', 'id', '']);
-};
-
 // update the grid
 // FIXME: this is not great
-$: if (browser && map && map.getSource('dem') && dem) {
-	fetchData().then((data) => {
-		const grid = feature(data, data.objects.dem);
+$: if (browser && geoMap && geoMap.getSource('dem') && dem) {
+	fetchData().then(([es, csv]) => {
+		const grid = feature(es, es.objects.dem);
+		data = csv;
 
 		popup.remove();
-		map.getSource('dem').setData(grid);
+		geoMap.getSource('dem').setData(grid);
 	});
 }
 </script>

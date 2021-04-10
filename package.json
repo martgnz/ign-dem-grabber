@@ -1,5 +1,5 @@
 {
-	"name": "dem-es-grabber",
+	"name": "ign-dem-grabber",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "svelte-kit dev",
@@ -7,7 +7,7 @@
 		"start": "svelte-kit start",
 		"lint": "prettier --check . && eslint --ignore-path .gitignore .",
 		"format": "prettier --write .",
-		"get_data": "bash scripts/get-data.sh"
+		"convert-maps": "bash scripts/convert-maps.sh"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "next",

@@ -3,6 +3,8 @@ node_modules
 /.svelte
 /build
 /functions
-scripts/data/*
-!scripts/data/.gitkeep
+scripts/maps/*
+scripts/maps-clean/*
+!scripts/maps/.gitkeep
+!scripts/maps-clean/.gitkeep
 .Rhistory
