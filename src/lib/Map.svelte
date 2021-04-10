@@ -62,11 +62,22 @@ let container;
 let geoMap;
 let data;
 let popup;
+let selectAll;
+let downloaded = {
+	MDT02: [],
+	MDT05: [],
+	MDT25: [],
+	MDT200: []
+};
 
 // fetch topojson
 const fetchData = () => Promise.all([json(`${dem}.json`), csv(`${dem}.csv`)]);
 
 onMount(async () => {
+	// https://kit.svelte.dev/docs#troubleshooting-server-side-rendering
+	const module = await import('d3-selection');
+	selectAll = module.selectAll;
+
 	// use retina tiles if dpi > 1
 	const retina = window.devicePixelRatio > 1 ? '@2' : '';
 
@@ -148,6 +159,18 @@ onMount(async () => {
 			});
 
 			geoMap.addLayer({
+				id: 'dem-downloaded',
+				type: 'fill',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'fill-color': 'rgba(67, 135, 0, .4)',
+					'fill-outline-color': 'rgba(0,0,0,.5)'
+				},
+				filter: ['==', 'name', '']
+			});
+
+			geoMap.addLayer({
 				id: 'dem-hover',
 				type: 'line',
 				source: 'dem',
@@ -198,7 +221,7 @@ const clicked = (e) => {
 	const id = datum[0].name;
 	const isMultiple = datum.length > 1;
 
-	geoMap.setFilter('dem-clicked', ['==', 'id', id]);
+	geoMap.setFilter('dem-clicked', ['==', 'name', id]);
 	popup
 		.setLngLat(e.lngLat)
 		.setHTML(
@@ -229,6 +252,14 @@ const clicked = (e) => {
 		</div>`
 		)
 		.addTo(geoMap);
+
+	// colour clicked tiles
+	selectAll('.tip-download').on('click', () => {
+		geoMap.setFilter('dem-clicked', ['==', 'name', '']);
+
+		downloaded[dem].push(id);
+		geoMap.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
+	});
 };
 
 const tooltipRow = ({ name, data }) => {
@@ -249,6 +280,7 @@ $: if (browser && geoMap && geoMap.getSource('dem') && dem) {
 
 		popup.remove();
 		geoMap.getSource('dem').setData(grid);
+		geoMap.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
 	});
 }
 </script>
