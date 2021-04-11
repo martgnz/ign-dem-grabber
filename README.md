@@ -1,6 +1,18 @@
 # ign-dem-grabber
 
-## GDAL cheat sheet
+Download elevation data from the [Spanish National Geographic Institute](https://centrodedescargas.cnig.es/CentroDescargas/index.jsp) easily.
+
+## Getting started
+
+This project uses [svelte-kit](https://github.com/sveltejs/kit). To start developing do `npm install` and `npm run dev`.
+
+## Data
+
+The scripts for obtaining and cleaning the data are on the `scripts` folder. For using the imagery you have to accept the terms of the [CC-BY licence](https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf).
+
+## Usage
+
+These are common GDAL commands you can use to work with this imagery:
 
 **Merge rasters**
 

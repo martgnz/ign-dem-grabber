@@ -4,17 +4,19 @@
 	"scripts": {
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
+		"deploy": "npm run build && gh-pages -d build",
 		"start": "svelte-kit start",
 		"lint": "prettier --check . && eslint --ignore-path .gitignore .",
 		"format": "prettier --write .",
 		"convert-maps": "bash scripts/convert-maps.sh"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-node": "next",
+		"@sveltejs/adapter-static": "^1.0.0-next.4",
 		"@sveltejs/kit": "next",
 		"eslint": "^7.22.0",
 		"eslint-config-prettier": "^8.1.0",
 		"eslint-plugin-svelte3": "^3.1.0",
+		"gh-pages": "^3.1.0",
 		"mapshaper": "^0.5.41",
 		"prettier": "~2.2.1",
 		"prettier-plugin-svelte": "^2.2.0",
