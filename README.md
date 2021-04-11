@@ -4,7 +4,7 @@ Download DEMs from the [Spanish National Geographic Institute](https://centroded
 
 ## Getting started
 
-This project uses [svelte-kit](https://github.com/sveltejs/kit). To start developing do `npm install` and `npm run dev`.
+This project uses [svelte-kit](https://kit.svelte.dev/). To start developing do `npm install` and `npm run dev`.
 
 ## Data
 
