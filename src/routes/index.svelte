@@ -35,9 +35,15 @@ a {
 	position: relative;
 }
 .radio:not(:last-child) {
-	margin-bottom: 0.5rem;
-	padding-bottom: 0.5rem;
+	margin-bottom: 0.25rem;
+	padding-bottom: 0.25rem;
 	border-bottom: 1px solid #dfdfdf;
+}
+@media (min-width: 600px) {
+	.radio:not(:last-child) {
+		margin-bottom: 0.5rem;
+		padding-bottom: 0.5rem;
+	}
 }
 label {
 	width: 100%;
@@ -59,6 +65,14 @@ label {
 	font-weight: 300;
 	font-size: 12px;
 	margin-bottom: 2px;
+}
+.desc {
+	display: none;
+}
+@media (min-width: 600px) {
+	.desc {
+		display: block;
+	}
 }
 </style>
 
@@ -91,7 +105,7 @@ const options = [
 <main>
 	<header>
 		<h1>Descarga modelos digitales <br /> de elevación</h1>
-		<p>
+		<p class="desc">
 			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
 			por el <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
 				>Instituto Geográfico Nacional</a> a partir de datos LIDAR.

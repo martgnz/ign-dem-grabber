@@ -6,7 +6,13 @@
 	width: 100%;
 }
 :global(.mapboxgl-popup) {
+	z-index: 1;
 	width: 230px;
+}
+@media (min-width: 600px) {
+	:global(.mapboxgl-popup) {
+		z-index: 0;
+	}
 }
 :global(.tip-title) {
 	font-weight: 700;
@@ -58,6 +64,7 @@ import { browser } from '$app/env';
 
 export let dem;
 
+let width;
 let container;
 let geoMap;
 let data;
@@ -70,6 +77,8 @@ let downloaded = {
 	MDT200: []
 };
 
+$: isMobile = width < 600;
+
 // fetch topojson
 const fetchData = () => Promise.all([json(`${dem}.json`), csv(`${dem}.csv`)]);
 
@@ -81,18 +90,18 @@ onMount(async () => {
 	// use retina tiles if dpi > 1
 	const retina = window.devicePixelRatio > 1 ? '@2' : '';
 
-	const bounds = [
-		[-21, 25],
-		[10, 45]
-	];
+	// const bounds = [
+	// 	[-21, 25],
+	// 	[10, 45]
+	// ];
 
 	// start map
 	geoMap = new Map({
 		container: 'map',
-		center: [-6, 40],
-		zoom: 5.75,
+		center: isMobile ? [-4, 40] : [-6, 40],
+		zoom: isMobile ? 5 : 5.75,
+		minZoom: isMobile ? 5 : 5.75,
 		maxZoom: 10,
-		minZoom: 5.75,
 		// maxBounds: bounds,
 		style: {
 			version: 8,
@@ -284,5 +293,7 @@ $: if (browser && geoMap && geoMap.getSource('dem') && dem) {
 	});
 }
 </script>
+
+<svelte:window bind:innerWidth={width} />
 
 <div id="map" bind:this={container} />
