@@ -242,7 +242,7 @@ const clicked = (e) => {
 						action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
 						<input type="hidden" name="secuencialDescDir" value="${d.id}" />
 						<button class="tip-download" type="submit">Descargar ${
-							isMultiple ? `UTM ${d.utm_zone}` : ''
+							isMultiple ? `UTM ${d.utm_zone}` : 'hoja'
 						}</button>
 					</form>
 				`
