@@ -12,7 +12,7 @@ The scripts for obtaining and cleaning the data are on the `scripts` folder. For
 
 ## Usage
 
-These are common GDAL commands you can use to work with this imagery:
+These are common GDAL commands you can use to work with this imagery. You can find more in [this cheatsheet](https://github.com/dwtkns/gdal-cheat-sheet).
 
 **Merge rasters**
 
