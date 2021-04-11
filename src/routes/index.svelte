@@ -46,7 +46,7 @@ label {
 	pointer-events: none;
 	position: absolute;
 	right: 0;
-	top: 0;
+	top: 4px;
 	font-size: 12px;
 	font-weight: 300;
 	font-style: italic;
