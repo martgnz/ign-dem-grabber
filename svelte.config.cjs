@@ -12,6 +12,10 @@ module.exports = {
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: '#svelte',
 
+		paths: {
+			base: '/ign-dem-grabber'
+		},
+
 		vite: {
 			ssr: {
 				noExternal: Object.keys(pkg.dependencies || {})
