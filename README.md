@@ -1,6 +1,6 @@
 # ign-dem-grabber
 
-Download elevation data from the [Spanish National Geographic Institute](https://centrodedescargas.cnig.es/CentroDescargas/index.jsp) easily.
+Download DEMs from the [Spanish National Geographic Institute](https://centrodedescargas.cnig.es/CentroDescargas/index.jsp) easily.
 
 ## Getting started
 
