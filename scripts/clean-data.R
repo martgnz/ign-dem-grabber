@@ -94,7 +94,7 @@ clean_mdt200 <- function(df) {
 }
 
 # Clean shapefiles --------------------------------------------------------
-clean_mtd02_geo <- function(input, file) {
+clean_mdt02_geo <- function(input, file) {
   shp <- readOGR(paste0('maps/', input))
   shp$name <-  str_extract(shp$Fichero, '(?<=HU).*') %>% 
     str_split('-') %>% 
@@ -111,7 +111,7 @@ clean_mtd02_geo <- function(input, file) {
   writeOGR(shp, "maps-clean", file, driver="ESRI Shapefile", overwrite_layer = T)  
 }
 
-clean_mtd05_geo <- function(input, file) {
+clean_mdt05_geo <- function(input, file) {
   shp <- readOGR(paste0('maps/', input))
   shp$name <- str_extract(shp$FICHERO, '(?<=HU).*') %>%
     str_sub(., 4, str_length(.)) %>%
@@ -128,7 +128,7 @@ clean_mtd05_geo <- function(input, file) {
   writeOGR(shp, "maps-clean", file, driver="ESRI Shapefile", overwrite_layer = T)  
 }
 
-clean_mtd25_geo <- function(input, file) {
+clean_mdt25_geo <- function(input, file) {
   shp <- readOGR(paste0('maps/', input))
   shp$name <- str_replace(shp$MTN50_CLAS, '/', '-')
   shp$NOMBRE_50 <- NULL
@@ -141,9 +141,9 @@ clean_mtd25_geo <- function(input, file) {
 
 
 # Run ---------------------------------------------------------------------
-clean_mtd02_geo('MDT02_COB2_Fechas.shp', 'MDT02')
-clean_mtd05_geo('MDT05.shp', 'MDT05')
-clean_mtd25_geo('MTN50_ETRS89_Peninsula_Baleares_Canarias.shp', 'MDT25')
+clean_mdt02_geo('MDT02_COB2_Fechas.shp', 'MDT02')
+clean_mdt05_geo('MDT05.shp', 'MDT05')
+clean_mdt25_geo('MTN50_ETRS89_Peninsula_Baleares_Canarias.shp', 'MDT25')
 
 mdt02 <- read_csv('data/MDT02.csv') %>% 
   clean_mdt02() %>% 
