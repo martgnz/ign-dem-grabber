@@ -27,5 +27,5 @@ For some reason QGIS doesn't recognise the coordinate system of these files stra
 This is how we add geographic metadata to a UTM30 tile:
 
 ```bash
-gdalwarp -s_srs "EPSG:25830" -t_srs "EPSG:25830" -r bilinear merged.tif reprojected.tif
+gdalwarp -s_srs "EPSG:25830" -t_srs "EPSG:25830" merged.tif reprojected.tif
 ```
