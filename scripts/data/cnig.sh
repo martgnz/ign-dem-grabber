@@ -90,7 +90,7 @@ function main {
     # a good idea
     local list=$(with-retry cnig-list $series $page)
     local ids=($(echo "$list" | grep 'secGeo' | grep -oE 'value=.*\"' | sed s/value\=// | sed s/\"//g))
-    local dates=($(echo "$list" | grep 'data-th="Fecha"' | perl -pe 's/.*\>\s*(.*?)\s*\<.*/"\1"/' | perl -pe 's/,\s/,/g'))
+    local dates=($(echo "$list" | grep 'data-th="Fecha"' | perl -pe 's/.*\>\s*(.*?)\s*\<.*/"\1"/' | perl -pe 's/\s*,\s*/,/g'))
     local sizes=($(echo "$list" | grep 'data-th="Tamaño' | perl -pe 's/.*\>\s*(.*?)\s*\<.*/\1/'))
     local len=${#ids[@]}
 
