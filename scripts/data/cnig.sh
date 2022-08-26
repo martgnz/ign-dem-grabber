@@ -43,11 +43,6 @@ function cnig-list {
   curl 'http://centrodedescargas.cnig.es/CentroDescargas/resultadosArchivos' --data-raw "geom=None&coords=%7B%22type%22+%3A+%22FeatureCollection%22%2C+%22features%22+%3A+%5B%7B%22type%22%3A%22Feature%22%2C%22geometry%22%3A%7B%22type%22%3A+%22Polygon%22%2C%22coordinates%22%3A+%5B%5B%5B-180%2C-90%5D%2C%5B-180%2C84.1640960027031%5D%2C%5B180.122131343973%2C84.1640960027031%5D%2C%5B180.122131343973%2C-90%5D%2C%5B-180%2C-90%5D%5D%5D%7D%7D%5D%7D&numPagina=$page&numTotalReg=2248&codSerie=$series&series=$series&codProvAv=&codIneAv=&codComAv=&numHojaAv=&todaEsp=&todoMundo=&tipoBusqueda=VI&tipoArchivo=&contiene=&subSerieExt=&codSubSerie=&idProcShape=" --fail 2> /dev/null
 }
 
-function cnig-ids {
-  cnig-list $series $page | grep 'secGeo' | grep -oE 'value=.*\"' | sed s/value\=// | sed s/\"//g
-  return ${PIPESTATUS[0]}
-}
-
 function with-retry {
   # XXX parse these as arguments
   local base_wait=2
@@ -86,13 +81,18 @@ function main {
   local page=${2:-1}
 
   # only print csv header on page 1
-  [[ $page -eq 1 ]] && echo "series,filename,id,page"
+  [[ $page -eq 1 ]] && echo "series,filename,id,date,size,page"
 
   local prompt="▏ cnig.es $series #%02d %02d|%02d ▕"
 
   while true; do
-    local ids=$(with-retry cnig-ids $series $page)
-    local len=$(echo $ids | wc -w | awk '{ print $1 }')
+    # note that at this point parsing this using bash is more an exercise than
+    # a good idea
+    local list=$(with-retry cnig-list $series $page)
+    local ids=($(echo "$list" | grep 'secGeo' | grep -oE 'value=.*\"' | sed s/value\=// | sed s/\"//g))
+    local dates=($(echo "$list" | grep 'data-th="Fecha"' | perl -pe 's/.*\>\s*(.*?)\s*\<.*/"\1"/' | perl -pe 's/\s*,\s*/,/g'))
+    local sizes=($(echo "$list" | grep 'data-th="Tamaño' | perl -pe 's/.*\>\s*(.*?)\s*\<.*/\1/'))
+    local len=${#ids[@]}
 
     [[ $len -eq 0 ]] && break
 
@@ -101,9 +101,9 @@ function main {
 
     log:inf "${COLORS[1]}$(printf "$prompt" $page 1 $len)\033[0m"
 
-    for id in $ids; do
+    for id in "${ids[@]}"; do
       filename=$(with-retry cnig-filename $id)
-      echo $series,$filename,$id,$page
+      echo $series,$filename,$id,${dates[$i-1]},${sizes[$i-1]},$page
 
       ((i+=1))
 
