@@ -269,6 +269,13 @@ const clicked = (e) => {
 		)
 		.addTo(geoMap);
 
+	// remove highlight when tooltip is closed manually
+	// FIXME: is there a way to remove the listener once we click away?
+	const closeButton = document.querySelector('.mapboxgl-popup-close-button');
+	closeButton.addEventListener('click', () => {
+		geoMap.setFilter('dem-clicked', ['==', 'name', '']);
+	});
+
 	// colour clicked tiles
 	selectAll('.tip-download').on('click', () => {
 		geoMap.setFilter('dem-clicked', ['==', 'name', '']);
