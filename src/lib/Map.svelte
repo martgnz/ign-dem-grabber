@@ -82,6 +82,11 @@ $: isMobile = width < 600;
 // fetch topojson
 const fetchData = () => Promise.all([json(`${dem}.json`), csv(`${dem}.csv`)]);
 
+const getCleanGrid = (es, csv) => ({
+	type: 'FeatureCollection',
+	features: es.features.filter((d) => csv.map((k) => k.name).includes(d.properties.name))
+});
+
 onMount(async () => {
 	// https://kit.svelte.dev/docs#troubleshooting-server-side-rendering
 	const module = await import('d3-selection');
@@ -99,8 +104,8 @@ onMount(async () => {
 	geoMap = new Map({
 		container: 'map',
 		center: isMobile ? [-4, 40] : [-6, 40],
-		zoom: isMobile ? 5 : 5.75,
-		minZoom: isMobile ? 5 : 5.75,
+		zoom: isMobile ? 5 : 5.5,
+		minZoom: isMobile ? 5 : 5.5,
 		maxZoom: 10,
 		// maxBounds: bounds,
 		style: {
@@ -136,7 +141,7 @@ onMount(async () => {
 	// add our tiles
 	geoMap.on('load', () => {
 		fetchData().then(([es, csv]) => {
-			const grid = feature(es, es.objects.dem);
+			const grid = getCleanGrid(feature(es, es.objects.dem), csv);
 			data = csv;
 
 			geoMap.addSource('dem', {
@@ -195,7 +200,7 @@ onMount(async () => {
 
 	// create a popup, but don't add it to the map yet.
 	popup = new Popup({
-		closeButton: false,
+		closeButton: true,
 		closeOnClick: false,
 		offset: 15
 	});
@@ -221,28 +226,30 @@ const mouseleft = (e) => {
 };
 
 const clicked = (e) => {
-	const { name, date } = e.features[0].properties;
-	const datum = data.filter((d) => d.name === name);
+	const { name: featureName } = e.features[0].properties;
+	const tile = data.filter((d) => d.name === featureName);
 
-	if (!datum) return;
+	if (!tile) return;
 
 	// we get the first match for the hover
-	const id = datum[0].name;
-	const isMultiple = datum.length > 1;
+	const { name, date, size, datum } = tile[0];
+	const isMultiple = tile.length > 1;
 
-	geoMap.setFilter('dem-clicked', ['==', 'name', id]);
+	geoMap.setFilter('dem-clicked', ['==', 'name', name]);
 	popup
 		.setLngLat(e.lngLat)
 		.setHTML(
 			`<div class="tip-container">
-				<div class="tip-title">${dem === 'MDT200' ? id : `Hoja ${datum[0].name}`}</div>
+				<div class="tip-title">${dem === 'MDT200' ? name : `Hoja ${name}`}</div>
 				${tooltipRow({ name: 'Fecha', data: date })}
-				${tooltipRow({ name: 'Datum', data: datum[0].datum })}
+				${tooltipRow({ name: 'Datum', data: datum })}
 				${tooltipRow({
 					name: `Zona${isMultiple ? 's' : ''} UTM`,
-					data: datum.map((d) => d.utm_zone).join(', ')
+					data: tile.map((d) => d.utm_zone).join(', ')
 				})}
-				${datum
+				${tooltipRow({ name: 'Tamaño', data: `${Math.floor(+size)}MB` })}
+
+				${tile
 					.map(
 						(d) => `
 					<form
@@ -284,7 +291,7 @@ const tooltipRow = ({ name, data }) => {
 // FIXME: this is not great
 $: if (browser && geoMap && geoMap.getSource('dem') && dem) {
 	fetchData().then(([es, csv]) => {
-		const grid = feature(es, es.objects.dem);
+		const grid = getCleanGrid(feature(es, es.objects.dem), csv);
 		data = csv;
 
 		popup.remove();
