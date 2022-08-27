@@ -25,16 +25,16 @@
 
 
 
-<link rel="modulepreload" href="/ign-dem-grabber/_app/start-6fe007f0.js">
-			<link rel="modulepreload" href="/ign-dem-grabber/_app/chunks/vendor-86d31c5a.js">
+<link rel="modulepreload" href="/ign-dem-grabber/_app/start-ffc62dc8.js">
+			<link rel="modulepreload" href="/ign-dem-grabber/_app/chunks/vendor-1e9c6aa1.js">
 			<link rel="modulepreload" href="/ign-dem-grabber/_app/chunks/preload-helper-9f12a5fd.js">
-			<link rel="modulepreload" href="/ign-dem-grabber/_app/pages/index.svelte-6a507ecf.js">
+			<link rel="modulepreload" href="/ign-dem-grabber/_app/pages/index.svelte-49e9fd08.js">
 			<link rel="stylesheet" href="/ign-dem-grabber/_app/assets/start-eff31346.css">
-			<link rel="stylesheet" href="/ign-dem-grabber/_app/assets/pages/index.svelte-e56ce31b.css">
+			<link rel="stylesheet" href="/ign-dem-grabber/_app/assets/pages/index.svelte-6725a0a3.css">
 
 
 		<script type="module">
-			import { start } from "/ign-dem-grabber/_app/start-6fe007f0.js";
+			import { start } from "/ign-dem-grabber/_app/start-ffc62dc8.js";
 			start({
 				target: document.querySelector("#svelte"),
 				paths: {"base":"/ign-dem-grabber","assets":"/ign-dem-grabber"},
@@ -45,7 +45,7 @@
 					status: 200,
 					error: null,
 					nodes: [
-						import("/ign-dem-grabber/_app/pages/index.svelte-6a507ecf.js")
+						import("/ign-dem-grabber/_app/pages/index.svelte-49e9fd08.js")
 					],
 					page: {
 						host: location.host, // TODO this is redundant
@@ -61,34 +61,36 @@
 		<div id="svelte">
 
 
-<main><header class="svelte-15vulur"><h1 class="svelte-15vulur">Descarga modelos digitales <br> de elevación</h1>
-<p class="desc svelte-15vulur">Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
-	por el <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#" class="svelte-15vulur">Instituto Geográfico Nacional</a> a partir de datos LIDAR.
+<main><header class="svelte-1m8yqa6"><h1 class="svelte-1m8yqa6">Descarga modelos digitales <br> de elevación</h1>
+<div class="highlight svelte-1m8yqa6">Actualización 2022: +1.000 nuevas teselas de 2m.</div>
+<p class="desc svelte-1m8yqa6">Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
+	por el
+	<a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#" class="svelte-1m8yqa6">Instituto Geográfico Nacional</a> a partir de datos LIDAR.
 </p>
 
-<div class="options svelte-15vulur"><h2 class="svelte-15vulur">Escoge la resolución</h2>
+<div class="options svelte-1m8yqa6"><h2 class="svelte-1m8yqa6">Escoge la resolución</h2>
 
-	<div class="radio svelte-15vulur"><input type="radio" name="dem" id="MDT02" value="MDT02">
-			<label for="MDT02" class="svelte-15vulur">2 metros</label>
-			<div class="note svelte-15vulur">Cobertura incompleta</div>
-		</div><div class="radio svelte-15vulur"><input type="radio" name="dem" id="MDT05" value="MDT05">
-			<label for="MDT05" class="svelte-15vulur">5 metros</label>
+	<div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT02" value="MDT02">
+			<label for="MDT02" class="svelte-1m8yqa6">2 metros</label>
+			<div class="note svelte-1m8yqa6">Cobertura incompleta</div>
+		</div><div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT05" value="MDT05" checked>
+			<label for="MDT05" class="svelte-1m8yqa6">5 metros</label>
 			
-		</div><div class="radio svelte-15vulur"><input type="radio" name="dem" id="MDT25" value="MDT25">
-			<label for="MDT25" class="svelte-15vulur">25 metros</label>
+		</div><div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT25" value="MDT25">
+			<label for="MDT25" class="svelte-1m8yqa6">25 metros</label>
 			
-		</div><div class="radio svelte-15vulur"><input type="radio" name="dem" id="MDT200" value="MDT200">
-			<label for="MDT200" class="svelte-15vulur">200 metros</label>
+		</div><div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT200" value="MDT200">
+			<label for="MDT200" class="svelte-1m8yqa6">200 metros</label>
 			
 		</div></div>
 
-<div class="info svelte-15vulur"><p class="svelte-15vulur">Datos en formato <a href="https://gdal.org/drivers/raster/aaigrid.html#raster-aaigrid" class="svelte-15vulur">ASCII Grid</a>
+<div class="info svelte-1m8yqa6"><p class="svelte-1m8yqa6">Datos en formato <a href="https://gdal.org/drivers/raster/aaigrid.html#raster-aaigrid" class="svelte-1m8yqa6">ASCII Grid</a>
 		con
-		<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf" class="svelte-15vulur">licencia CC-BY</a>.
+		<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf" class="svelte-1m8yqa6">licencia CC-BY</a>.
 	</p>
-	<p class="svelte-15vulur"><a href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/MDT05_recursos.zip" class="svelte-15vulur">Descarga la referencia técnica</a>.
+	<p class="svelte-1m8yqa6"><a href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/MDT05_recursos.zip" class="svelte-1m8yqa6">Descarga la referencia técnica</a>.
 	</p>
-	<p class="svelte-15vulur">Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber" class="svelte-15vulur">GitHub</a>.
+	<p class="svelte-1m8yqa6">Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber" class="svelte-1m8yqa6">GitHub</a>.
 	</p></div></header>
 
 	<div class="content">
