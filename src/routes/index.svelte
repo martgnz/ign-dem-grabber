@@ -74,6 +74,16 @@ label {
 		display: block;
 	}
 }
+.highlight {
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 300;
+	background-color: #ffffba;
+	border-radius: 5px;
+	padding: 6px;
+	padding-bottom: 4px;
+	margin-bottom: 5px;
+}
 </style>
 
 <script>
@@ -105,9 +115,11 @@ const options = [
 <main>
 	<header>
 		<h1>Descarga modelos digitales <br /> de elevación</h1>
+		<div class="highlight">Actualización 2022: +1.000 nuevas teselas de 2m.</div>
 		<p class="desc">
 			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
-			por el <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
+			por el
+			<a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
 				>Instituto Geográfico Nacional</a> a partir de datos LIDAR.
 		</p>
 
