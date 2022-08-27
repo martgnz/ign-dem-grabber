@@ -273,7 +273,7 @@ const clicked = (e) => {
 	selectAll('.tip-download').on('click', () => {
 		geoMap.setFilter('dem-clicked', ['==', 'name', '']);
 
-		downloaded[dem].push(id);
+		downloaded[dem].push(name);
 		geoMap.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
 	});
 };
