@@ -13,9 +13,9 @@
 	let data = $state(null);
 	let isMobile = $derived(width < 600);
 
-	let container;
-	let map;
-	let popup;
+	let container = $state(null);
+	let map = $state(null);
+	let popup = $state(null);
 
 	let downloaded = {
 		MDT02: [],
@@ -68,7 +68,7 @@
 		map.addControl(
 			new maplibregl.AttributionControl({
 				customAttribution:
-					'© CC-BY 4.0 <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">scne.es 2015-2021</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
+					'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">CC-BY 4.0 scne.es 2015-2021</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
 			})
 		);
 
@@ -149,7 +149,7 @@
 		const { name: featureName } = e.features[0].properties;
 		const tile = data.filter((d) => d.name === featureName);
 
-		if (!tile) return;
+		if (!tile || !tile[0]) return;
 
 		// we get the first match for the hover
 		const { name, date, size, datum } = tile[0];
