@@ -17,23 +17,23 @@ $ npm install
 2. Navigate to this folder and run the scraper to get metadata for each tile on every resolution:
 
 ```bash
-$ ./scrape-data.sh
+$ npm run 01-scrape-data
 ```
 
 3. Run this script to download the tiles:
 
 ```bash
-$ ./download-maps.sh
+$ npm run 02-download-maps
 ```
 
 4. Process the scraped data and generate clean CSVs and shapefiles:
 
 ```bash
-$ Rscript clean-data.R
+$ npm run 03-clean-data
 ```
 
 5. Convert the files to TopoJSON
 
 ```bash
-$ npm run convert-maps
+$ npm run 04-convert-maps
 ```

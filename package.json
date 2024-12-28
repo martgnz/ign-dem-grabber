@@ -8,7 +8,10 @@
 		"deploy": "npm run build && gh-pages -t -d build",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"convert-maps": "bash scripts/convert-maps.sh"
+		"01-scrape-data": "bash scripts/01-scrape-data.sh",
+		"02-download-maps": "bash scripts/02-download-maps.sh",
+		"03-clean-data": "Rscript scripts/03-clean-data.sh",
+		"04-convert-maps": "bash scripts/04-convert-maps.sh"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "3.0.8",

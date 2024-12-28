@@ -3,18 +3,20 @@
 
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
-	import { csv, json } from 'd3-fetch';
+	import { csv as fetchCsv, json } from 'd3-fetch';
+	import { selectAll } from 'd3-selection';
 	import { feature } from 'topojson-client';
 	import maplibregl from 'maplibre-gl';
 
-	export let dem;
+	let { dem } = $props();
+	let width = $state(0);
+	let data = $state(null);
+	let isMobile = $derived(width < 600);
 
-	let width;
 	let container;
-	let geoMap;
-	let data;
+	let map;
 	let popup;
-	let selectAll;
+
 	let downloaded = {
 		MDT02: [],
 		MDT05: [],
@@ -22,31 +24,17 @@
 		MDT200: []
 	};
 
-	$: isMobile = width < 600;
-
-	// fetch topojson
-	const fetchData = () => Promise.all([json(`${dem}.json`), csv(`${dem}.csv`)]);
-
-	const getCleanGrid = (es, csv) => ({
+	const getGrid = (es, csv) => ({
 		type: 'FeatureCollection',
 		features: es.features.filter((d) => csv.map((k) => k.name).includes(d.properties.name))
 	});
 
 	onMount(async () => {
-		// https://kit.svelte.dev/docs#troubleshooting-server-side-rendering
-		const module = await import('d3-selection');
-		selectAll = module.selectAll;
-
 		// use retina tiles if dpi > 1
 		const retina = window.devicePixelRatio > 1 ? '@2' : '';
 
-		// const bounds = [
-		// 	[-21, 25],
-		// 	[10, 45]
-		// ];
-
 		// start map
-		geoMap = new maplibregl.Map({
+		map = new maplibregl.Map({
 			container: 'map',
 			center: isMobile ? [-4, 40] : [-6, 40],
 			zoom: isMobile ? 5 : 5.5,
@@ -76,73 +64,78 @@
 			}
 		});
 
-		geoMap.dragRotate.disable();
-		geoMap.addControl(
+		map.dragRotate.disable();
+		map.addControl(
 			new maplibregl.AttributionControl({
 				customAttribution:
 					'© CC-BY 4.0 <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">scne.es 2015-2021</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
 			})
 		);
 
-		// add our tiles
-		geoMap.on('load', () => {
-			fetchData().then(([es, csv]) => {
-				const grid = getCleanGrid(feature(es, es.objects.dem), csv);
-				data = csv;
+		// once tiles are loaded, add grid
+		map.on('load', async () => {
+			const [es, csv] = await Promise.all([json(`${dem}.json`), fetchCsv(`${dem}.csv`)]);
+			// FIXME: v bad
+			data = csv;
+			const grid = getGrid(feature(es, es.objects.dem), data);
 
-				geoMap.addSource('dem', {
-					type: 'geojson',
-					data: grid
-				});
+			map.addSource('dem', {
+				type: 'geojson',
+				data: grid
+			});
 
-				geoMap.addLayer({
-					id: 'dem',
-					type: 'fill',
-					source: 'dem',
-					layout: {},
-					paint: {
-						'fill-color': 'rgba(0,0,0,.05)',
-						'fill-outline-color': 'rgba(0,0,0,.15)'
-					}
-				});
+			map.addLayer({
+				id: 'dem',
+				type: 'fill',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'fill-color': 'rgba(0,0,0,.05)',
+					'fill-outline-color': 'rgba(0,0,0,.15)'
+				}
+			});
 
-				geoMap.addLayer({
-					id: 'dem-clicked',
-					type: 'fill',
-					source: 'dem',
-					layout: {},
-					paint: {
-						'fill-color': 'rgba(244, 244, 150, 0.5)',
-						'fill-outline-color': 'rgba(0,0,0,.5)'
-					},
-					filter: ['==', 'name', '']
-				});
+			map.addLayer({
+				id: 'dem-clicked',
+				type: 'fill',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'fill-color': 'rgba(244, 244, 150, 0.5)',
+					'fill-outline-color': 'rgba(0,0,0,.5)'
+				},
+				filter: ['==', 'name', '']
+			});
 
-				geoMap.addLayer({
-					id: 'dem-downloaded',
-					type: 'fill',
-					source: 'dem',
-					layout: {},
-					paint: {
-						'fill-color': 'rgba(67, 135, 0, .4)',
-						'fill-outline-color': 'rgba(0,0,0,.5)'
-					},
-					filter: ['==', 'name', '']
-				});
+			map.addLayer({
+				id: 'dem-downloaded',
+				type: 'fill',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'fill-color': 'rgba(67, 135, 0, .4)',
+					'fill-outline-color': 'rgba(0,0,0,.5)'
+				},
+				filter: ['==', 'name', '']
+			});
 
-				geoMap.addLayer({
-					id: 'dem-hover',
-					type: 'line',
-					source: 'dem',
-					layout: {},
-					paint: {
-						'line-color': '#555',
-						'line-width': 2.5
-					},
-					filter: ['==', 'name', '']
-				});
+			map.addLayer({
+				id: 'dem-hover',
+				type: 'line',
+				source: 'dem',
+				layout: {},
+				paint: {
+					'line-color': '#555',
+					'line-width': 2.5
+				},
+				filter: ['==', 'name', '']
 			});
 		});
+
+		// hover
+		map.on('click', 'dem', clicked);
+		map.on('mousemove', 'dem', mousemoved);
+		map.on('mouseleave', 'dem', mouseleft);
 
 		// create a popup, but don't add it to the map yet.
 		popup = new maplibregl.Popup({
@@ -150,26 +143,7 @@
 			closeOnClick: false,
 			offset: 15
 		});
-
-		// hover
-		geoMap.on('click', 'dem', clicked);
-		geoMap.on('mousemove', 'dem', mousemoved);
-		geoMap.on('mouseleave', 'dem', mouseleft);
 	});
-
-	const mousemoved = (e) => {
-		const { name } = e.features[0].properties;
-
-		const datum = data.find((d) => d.name === name);
-		if (!datum) return;
-
-		const id = datum.name;
-		geoMap.setFilter('dem-hover', ['==', 'name', id]);
-	};
-
-	const mouseleft = (e) => {
-		geoMap.setFilter('dem-hover', ['==', 'name', '']);
-	};
 
 	const clicked = (e) => {
 		const { name: featureName } = e.features[0].properties;
@@ -181,7 +155,7 @@
 		const { name, date, size, datum } = tile[0];
 		const isMultiple = tile.length > 1;
 
-		geoMap.setFilter('dem-clicked', ['==', 'name', name]);
+		map.setFilter('dem-clicked', ['==', 'name', name]);
 		popup
 			.setLngLat(e.lngLat)
 			.setHTML(
@@ -213,21 +187,21 @@
 			
 		</div>`
 			)
-			.addTo(geoMap);
+			.addTo(map);
 
 		// remove highlight when tooltip is closed manually
 		// FIXME: is there a way to remove the listener once we click away?
-		const closeButton = document.querySelector('.mapboxgl-popup-close-button');
+		const closeButton = document.querySelector('.maplibregl-popup-close-button');
 		closeButton.addEventListener('click', () => {
-			geoMap.setFilter('dem-clicked', ['==', 'name', '']);
+			map.setFilter('dem-clicked', ['==', 'name', '']);
 		});
 
 		// colour clicked tiles
 		selectAll('.tip-download').on('click', () => {
-			geoMap.setFilter('dem-clicked', ['==', 'name', '']);
+			map.setFilter('dem-clicked', ['==', 'name', '']);
 
 			downloaded[dem].push(name);
-			geoMap.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
+			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
 		});
 	};
 
@@ -240,23 +214,37 @@
 		</div>`;
 	};
 
-	// update the grid
-	// FIXME: this is not great
-	$: if (browser && geoMap && geoMap.getSource('dem') && dem) {
-		fetchData().then(([es, csv]) => {
-			const grid = getCleanGrid(feature(es, es.objects.dem), csv);
-			data = csv;
+	const mousemoved = (e) => {
+		const { name } = e.features[0].properties;
 
+		const datum = data.find((d) => d.name === name);
+		if (!datum) return;
+
+		const id = datum.name;
+		map.setFilter('dem-hover', ['==', 'name', id]);
+	};
+
+	const mouseleft = (e) => {
+		map.setFilter('dem-hover', ['==', 'name', '']);
+	};
+
+	$effect(async () => {
+		const [es, csv] = await Promise.all([json(`${dem}.json`), fetchCsv(`${dem}.csv`)]);
+		// FIXME: v bad
+		data = csv;
+		const grid = getGrid(feature(es, es.objects.dem), data);
+
+		if (map && map.getSource('dem')) {
 			popup.remove();
-			geoMap.getSource('dem').setData(grid);
-			geoMap.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
-		});
-	}
+			map.getSource('dem').setData(grid);
+			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
+		}
+	});
 </script>
 
 <svelte:window bind:innerWidth={width} />
 
-<div id="map" bind:this={container} />
+<div id="map" bind:this={container}></div>
 
 <style>
 	#map {
@@ -265,40 +253,41 @@
 		bottom: 0;
 		width: 100%;
 	}
-	:global(.mapboxgl-popup) {
+	#map :global(.maplibregl-popup) {
 		z-index: 1;
 		width: 230px;
 	}
 	@media (min-width: 600px) {
-		:global(.mapboxgl-popup) {
+		#map :global(.maplibregl-popup) {
 			z-index: 0;
 		}
 	}
-	:global(.tip-title) {
+	#map :global(.tip-title) {
 		font-weight: 700;
 		font-size: 14px;
 		margin-bottom: 0.25rem;
 	}
-	:global(.tip-row) {
+	#map :global(.tip-row) {
 		font-size: 14px;
 		display: flex;
 		justify-content: space-between;
 	}
-	:global(.tip-row:not(:last-of-type)) {
+	#map :global(.tip-row:not(:last-of-type)) {
 		border-bottom: 1px solid #dfdfdf;
 		margin-bottom: 0.25rem;
 		padding-bottom: 0.25rem;
 	}
-	:global(.tip-name) {
+	#map :global(.tip-name) {
 		color: #7d7d7d;
 	}
-	:global(#map form) {
+	#map :global(#map form) {
 		text-align: center;
 		margin-top: 0.75rem;
 	}
-	:global(.tip-download) {
+	#map :global(.tip-download) {
+		margin-top: 10px;
 		cursor: pointer;
-		width: 80%;
+		width: 100%;
 		border: 1px solid #54851f;
 		border-radius: 4px;
 		background: #54851f;
@@ -308,7 +297,7 @@
 		padding: 8px;
 		text-align: center;
 	}
-	:global(.tip-download:hover) {
+	#map :global(.tip-download:hover) {
 		background: #4e6e2c;
 	}
 </style>
