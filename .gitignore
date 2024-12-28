@@ -1,8 +1,27 @@
-.DS_Store
 node_modules
-/.svelte
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
 /build
-/functions
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
 scripts/maps/*
 scripts/maps-clean/*
 !scripts/maps/.gitkeep
