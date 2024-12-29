@@ -3,31 +3,56 @@
 
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
-	import { csv as fetchCsv, json } from 'd3-fetch';
+	import { csv, json } from 'd3-fetch';
 	import { selectAll } from 'd3-selection';
 	import { feature } from 'topojson-client';
 	import maplibregl from 'maplibre-gl';
 
 	let { selected } = $props();
 
+	let mounted = $state(false);
 	let width = $state(0);
-	let data = $state(null);
 	let isMobile = $derived(width < 600);
 
 	let container = $state(null);
 	let map = $state(null);
 	let popup = $state(null);
 
-	let downloaded = {
+	let es = $state(null);
+	let data = $state(null);
+
+	let downloaded = $state({
 		MDT02: [],
 		MDT05: [],
 		MDT25: [],
 		MDT200: []
+	});
+
+	const roundMb = (size) => {
+		if (size < 1) return size;
+		return Math.floor(size);
 	};
 
-	const getGrid = (es, csv) => ({
-		type: 'FeatureCollection',
-		features: es.features.filter((d) => csv.map((k) => k.name).includes(d.properties.name))
+	const fetchData = async () =>
+		await Promise.all([
+			json(`${selected.coverage.tiles}.json`),
+			csv(`${selected.dem}_${selected.coverage.value}.csv`)
+		]);
+
+	$effect(async () => {
+		if (mounted && selected && map?.getSource('dem')) {
+			[es, data] = await fetchData();
+			const dataIds = new Set(data.map((d) => d.id));
+
+			popup.remove();
+			map.getSource('dem').setData({
+				type: 'FeatureCollection',
+				features: feature(es, es.objects.dem).features.filter((d) => {
+					return dataIds.has(d.properties.id);
+				})
+			});
+			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[selected.dem]]);
+		}
 	});
 
 	onMount(async () => {
@@ -75,17 +100,17 @@
 
 		// once tiles are loaded, add grid
 		map.on('load', async () => {
-			const [es, csv] = await Promise.all([
-				json(`${selected.dem}.json`),
-				fetchCsv(`${selected.dem}.csv`)
-			]);
-			// FIXME: v bad
-			data = csv;
-			const grid = getGrid(feature(es, es.objects.dem), data);
+			[es, data] = await fetchData();
+			const dataIds = new Set(data.map((d) => d.id));
 
 			map.addSource('dem', {
 				type: 'geojson',
-				data: grid
+				data: {
+					type: 'FeatureCollection',
+					features: feature(es, es.objects.dem).features.filter((d) => {
+						return dataIds.has(d.properties.id);
+					})
+				}
 			});
 
 			map.addLayer({
@@ -108,7 +133,7 @@
 					'fill-color': 'rgba(244, 244, 150, 0.5)',
 					'fill-outline-color': 'rgba(0,0,0,.5)'
 				},
-				filter: ['==', 'name', '']
+				filter: ['==', 'id', '']
 			});
 
 			map.addLayer({
@@ -120,7 +145,7 @@
 					'fill-color': 'rgba(67, 135, 0, .4)',
 					'fill-outline-color': 'rgba(0,0,0,.5)'
 				},
-				filter: ['==', 'name', '']
+				filter: ['==', 'id', '']
 			});
 
 			map.addLayer({
@@ -132,7 +157,7 @@
 					'line-color': '#555',
 					'line-width': 2.5
 				},
-				filter: ['==', 'name', '']
+				filter: ['==', 'id', '']
 			});
 		});
 
@@ -147,31 +172,27 @@
 			closeOnClick: false,
 			offset: 15
 		});
+
+		mounted = true;
 	});
 
 	const clicked = (e) => {
-		const { name: featureName } = e.features[0].properties;
-		const tile = data.filter((d) => d.name === featureName);
+		const { id, name } = e.features[0].properties;
+		const tile = data.filter((d) => d.id === id);
 
 		if (!tile || !tile[0]) return;
 
 		// we get the first match for the hover
-		const { name, date, size, datum } = tile[0];
-		const isMultiple = tile.length > 1;
+		const { date, size, datum } = tile[0];
 
-		map.setFilter('dem-clicked', ['==', 'name', name]);
+		map.setFilter('dem-clicked', ['==', 'id', id]);
 		popup
 			.setLngLat(e.lngLat)
 			.setHTML(
 				`<div class="tip-container">
-				<div class="tip-title">${selected.dem === 'MDT200' ? name : `Hoja ${name}`}</div>
+				<div class="tip-title">${name}</div>
 				${tooltipRow({ name: 'Fecha', data: date })}
-				${tooltipRow({ name: 'Datum', data: datum })}
-				${tooltipRow({
-					name: `Zona${isMultiple ? 's' : ''} UTM`,
-					data: tile.map((d) => d.utm_zone).join(', ')
-				})}
-				${tooltipRow({ name: 'Tamaño', data: `${Math.floor(+size)}MB` })}
+				${tooltipRow({ name: 'Tamaño', data: `${roundMb(+size)}MB` })}
 
 				${tile
 					.map(
@@ -181,9 +202,7 @@
 						id="form"
 						action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
 						<input type="hidden" name="secuencialDescDir" value="${d.id}" />
-						<button class="tip-download" type="submit">Descargar ${
-							isMultiple ? `UTM ${d.utm_zone}` : 'hoja'
-						}</button>
+						<button class="tip-download" type="submit">Descargar ${d.datum}${d.utm_zone !== 'NA' ? ` (UTM ${d.utm_zone})` : ''}</button>
 					</form>
 				`
 					)
@@ -219,34 +238,15 @@
 	};
 
 	const mousemoved = (e) => {
-		const { name } = e.features[0].properties;
-
-		const datum = data.find((d) => d.name === name);
-		if (!datum) return;
-
-		const id = datum.name;
-		map.setFilter('dem-hover', ['==', 'name', id]);
+		const { id } = e.features[0].properties;
+		const f = data.find((d) => d.id === id);
+		if (!f) return;
+		map.setFilter('dem-hover', ['==', 'id', f.id]);
 	};
 
 	const mouseleft = (e) => {
-		map.setFilter('dem-hover', ['==', 'name', '']);
+		map.setFilter('dem-hover', ['==', 'id', '']);
 	};
-
-	$effect(async () => {
-		const [es, csv] = await Promise.all([
-			json(`${selected.dem}.json`),
-			fetchCsv(`${selected.dem}.csv`)
-		]);
-		// FIXME: v bad
-		data = csv;
-		const grid = getGrid(feature(es, es.objects.dem), data);
-
-		if (map && map.getSource('dem')) {
-			popup.remove();
-			map.getSource('dem').setData(grid);
-			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[selected.dem]]);
-		}
-	});
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -262,7 +262,10 @@
 	}
 	#map :global(.maplibregl-popup) {
 		z-index: 1;
-		width: 230px;
+		width: 240px;
+	}
+	#map :global(.maplibregl-popup-content) {
+		padding-top: 7px;
 	}
 	@media (min-width: 600px) {
 		#map :global(.maplibregl-popup) {

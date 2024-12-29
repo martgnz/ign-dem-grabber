@@ -4,30 +4,30 @@
 
 	const options = [
 		{
-			value: 'MDT02',
 			text: '2 metros',
+			value: 'MDT02',
 			note: 'Incompleto',
-			coverage: [{ text: '2ª cobertura (2015-2021)', value: 'COB2' }]
+			coverage: [{ text: '2ª cobertura (2015-2021)', value: 'COB2', tiles: 'MTN25' }]
 		},
 		{
-			value: 'MDT05',
 			text: '5 metros',
-			coverage: [{ text: '1ª cobertura (2008-2015)', value: 'COB1' }]
+			value: 'MDT05',
+			coverage: [{ text: '1ª cobertura (2008-2015)', value: 'COB1', tiles: 'MTN50' }]
 		},
 		{
-			value: 'MDT25',
 			text: '25 metros',
+			value: 'MDT25',
 			coverage: [
-				{ text: '1ª cobertura (2008-2015)', value: 'COB1' },
-				{ text: '2ª cobertura (2015-2021)', value: 'COB2' }
+				{ text: '1ª cobertura (2008-2015)', value: 'COB1', tiles: 'MTN50' },
+				{ text: '2ª cobertura (2015-2021)', value: 'COB2', tiles: 'MTN25' }
 			]
 		},
 		{
-			value: 'MDT200',
 			text: '200 metros',
+			value: 'MDT200',
 			coverage: [
-				{ text: '1ª cobertura (2008-2016)', value: 'COB1' },
-				{ text: '2ª cobertura (2015-2021)', value: 'COB2' }
+				{ text: '1ª cobertura (2008-2016)', value: 'COB1', tiles: 'provinces' },
+				{ text: '2ª cobertura (2015-2021)', value: 'COB2', tiles: 'MTN25' }
 			]
 		}
 	];
@@ -37,7 +37,9 @@
 
 	let selected = $derived({
 		dem: dem,
-		coverage: coverage[dem]
+		// -.-
+		// find the full coverage object since we need the tile slug too
+		coverage: options.find((d) => d.value === dem).coverage.find((d) => d.value === coverage[dem])
 	});
 </script>
 
@@ -45,7 +47,8 @@
 	<header>
 		<h1>Descarga modelos digitales <br /> de elevación del IGN</h1>
 		<div class="highlight">
-			Actualización 2024: descarga en formato GeoTIFF, soporte de coberturas y nuevas hojas 2m.
+			Actualización 2024: descarga en formato GeoTIFF, soporte de múltiples coberturas y nuevas
+			hojas 2m.
 		</div>
 		<p class="desc">
 			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
@@ -174,11 +177,13 @@
 	.highlight {
 		display: inline-block;
 		font-size: 12px;
-		font-weight: 300;
+		font-weight: 400;
 		background-color: #ffffba;
+		border: 1px solid #eeeead;
 		border-radius: 5px;
 		padding: 6px;
+		padding-top: 4px;
 		padding-bottom: 4px;
-		margin-bottom: 5px;
+		margin-bottom: 8px;
 	}
 </style>

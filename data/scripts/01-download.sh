@@ -21,8 +21,8 @@ provinces () {
   curl https://unpkg.com/es-atlas@0.6.0/es/provinces.json > data/input-data/provinces.json
 }
 
-csv MDT02 MDT02
-csv MDT05 MDT05
+csv MDT02_COB2 MDT02
+csv MDT05_COB1 MDT05
 csv MDT25_COB1 02107
 csv MDT25_COB2 T25C2
 csv MDT200_COB1 02109

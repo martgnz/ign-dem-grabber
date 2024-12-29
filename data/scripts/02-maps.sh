@@ -14,6 +14,8 @@ convert_provinces() {
   mapshaper data/input-data/provinces.json \
     -rename-layers dem=provinces \
     -drop target=autonomous_regions \
+    -rename-fields target=dem id=name \
+    -each 'name=id' \
     -o data/output-data/provinces.json format=topojson
 }
 
