@@ -24,4 +24,6 @@ vite.config.ts.timestamp-*
 
 data/input-data/*
 !data/input-data/.gitkeep
+data/output-data/*
+!data/output-data/.gitkeep
 .Rhistory
