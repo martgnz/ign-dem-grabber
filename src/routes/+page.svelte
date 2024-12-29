@@ -2,37 +2,56 @@
 	import '../app.css';
 	import Map from '$lib/Map.svelte';
 
-	let dem = 'MDT05';
-
 	const options = [
 		{
 			value: 'MDT02',
 			text: '2 metros',
-			note: 'Cobertura incompleta'
+			note: 'Incompleto',
+			coverage: [{ text: '2ª cobertura (2015-2021)', value: 'COB2' }]
 		},
 		{
 			value: 'MDT05',
-			text: '5 metros'
+			text: '5 metros',
+			coverage: [{ text: '1ª cobertura (2008-2015)', value: 'COB1' }]
 		},
 		{
 			value: 'MDT25',
-			text: '25 metros'
+			text: '25 metros',
+			coverage: [
+				{ text: '1ª cobertura (2008-2015)', value: 'COB1' },
+				{ text: '2ª cobertura (2015-2021)', value: 'COB2' }
+			]
 		},
 		{
 			value: 'MDT200',
-			text: '200 metros'
+			text: '200 metros',
+			coverage: [
+				{ text: '1ª cobertura (2008-2016)', value: 'COB1' },
+				{ text: '2ª cobertura (2015-2021)', value: 'COB2' }
+			]
 		}
 	];
+
+	let coverage = $state({ MDT02: 'COB2', MDT05: 'COB1', MDT25: 'COB2', MDT200: 'COB2' });
+	let dem = $state('MDT05');
+
+	let selected = $derived({
+		dem: dem,
+		coverage: coverage[dem]
+	});
 </script>
 
 <main>
 	<header>
-		<h1>Descarga modelos digitales <br /> de elevación</h1>
-		<div class="highlight">Actualización 2022: +1.000 nuevas teselas de 2m.</div>
+		<h1>Descarga modelos digitales <br /> de elevación del IGN</h1>
+		<div class="highlight">
+			Actualización 2024: descarga en formato GeoTIFF, soporte de coberturas y nuevas hojas 2m.
+		</div>
 		<p class="desc">
 			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
 			por el
-			<a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#"
+			<a
+				href="https://centrodedescargas.cnig.es/CentroDescargas/modelos-digitales-elevaciones#MDTER"
 				>Instituto Geográfico Nacional</a
 			> a partir de datos LIDAR.
 		</p>
@@ -40,31 +59,34 @@
 		<div class="options">
 			<h2>Escoge la resolución</h2>
 
-			{#each options as option}
+			{#each options as option, idx}
 				<div class="radio">
 					<input type="radio" name="dem" id={option.value} value={option.value} bind:group={dem} />
-					<label for={option.value}>{option.text}</label>
-					{#if option.note}
-						<div class="note">{option.note}</div>
-					{/if}
+					<label for={option.value}>
+						{option.text}
+						{#if option.note}<span class="note">({option.note})</span>{/if}
+					</label>
+
+					<select bind:value={coverage[option.value]} disabled={option.coverage.length === 1}>
+						{#each option.coverage as d}
+							<option value={d.value}>{d.text}</option>
+						{/each}
+					</select>
 				</div>
 			{/each}
 		</div>
 
 		<div class="info">
 			<p>
-				Datos en formato <a href="https://gdal.org/drivers/raster/aaigrid.html#raster-aaigrid"
-					>ASCII Grid</a
-				>
-				con
-				<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
-					>licencia CC-BY</a
-				>.
+				Datos en formato <a href="https://cogeo.org/">Cloud Optimized GeoTiff</a>. Licencia
+				<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf">CC-BY</a>.
 			</p>
 			<p>
-				<a href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/{dem}_recursos.zip"
-					>Descarga la referencia técnica</a
-				>.
+				<a
+					href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/{selected.dem}_recursos.zip"
+				>
+					Descarga la referencia técnica
+				</a>.
 			</p>
 			<p>
 				Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber">GitHub</a>.
@@ -73,7 +95,7 @@
 	</header>
 
 	<div class="content">
-		<Map {dem} />
+		<Map {selected} />
 	</div>
 </main>
 
@@ -85,7 +107,7 @@
 		position: absolute;
 		background: rgba(255, 255, 255, 0.9);
 		border-radius: 4px;
-		max-width: 285px;
+		max-width: 310px;
 		z-index: 1;
 		box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
 	}
@@ -128,10 +150,6 @@
 		width: 100%;
 	}
 	.note {
-		pointer-events: none;
-		position: absolute;
-		right: 0;
-		top: 4px;
 		font-size: 12px;
 		font-weight: 300;
 		font-style: italic;

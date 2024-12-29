@@ -8,7 +8,8 @@
 	import { feature } from 'topojson-client';
 	import maplibregl from 'maplibre-gl';
 
-	let { dem } = $props();
+	let { selected } = $props();
+
 	let width = $state(0);
 	let data = $state(null);
 	let isMobile = $derived(width < 600);
@@ -74,7 +75,10 @@
 
 		// once tiles are loaded, add grid
 		map.on('load', async () => {
-			const [es, csv] = await Promise.all([json(`${dem}.json`), fetchCsv(`${dem}.csv`)]);
+			const [es, csv] = await Promise.all([
+				json(`${selected.dem}.json`),
+				fetchCsv(`${selected.dem}.csv`)
+			]);
 			// FIXME: v bad
 			data = csv;
 			const grid = getGrid(feature(es, es.objects.dem), data);
@@ -160,7 +164,7 @@
 			.setLngLat(e.lngLat)
 			.setHTML(
 				`<div class="tip-container">
-				<div class="tip-title">${dem === 'MDT200' ? name : `Hoja ${name}`}</div>
+				<div class="tip-title">${selected.dem === 'MDT200' ? name : `Hoja ${name}`}</div>
 				${tooltipRow({ name: 'Fecha', data: date })}
 				${tooltipRow({ name: 'Datum', data: datum })}
 				${tooltipRow({
@@ -200,8 +204,8 @@
 		selectAll('.tip-download').on('click', () => {
 			map.setFilter('dem-clicked', ['==', 'name', '']);
 
-			downloaded[dem].push(name);
-			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
+			downloaded[selected.dem].push(name);
+			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[selected.dem]]);
 		});
 	};
 
@@ -229,7 +233,10 @@
 	};
 
 	$effect(async () => {
-		const [es, csv] = await Promise.all([json(`${dem}.json`), fetchCsv(`${dem}.csv`)]);
+		const [es, csv] = await Promise.all([
+			json(`${selected.dem}.json`),
+			fetchCsv(`${selected.dem}.csv`)
+		]);
 		// FIXME: v bad
 		data = csv;
 		const grid = getGrid(feature(es, es.objects.dem), data);
@@ -237,7 +244,7 @@
 		if (map && map.getSource('dem')) {
 			popup.remove();
 			map.getSource('dem').setData(grid);
-			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[dem]]);
+			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[selected.dem]]);
 		}
 	});
 </script>
