@@ -16,16 +16,16 @@ For the `R` script you need to install `tidyverse`.
 $ npm run 01-download
 ```
 
-2. Run this to clean the data:
+2. Convert the maps to TopoJSON:
 
 ```bash
-$ npm run 02-clean
+$ npm run 02-maps
 ```
 
-3. And last, convert the maps to TopoJSON:
+3. Clean the data:
 
 ```bash
-$ npm run 03-maps
+$ npm run 03-clean
 ```
 
 Once that is done, copy the files to the `static` folder to upload them to the website.
