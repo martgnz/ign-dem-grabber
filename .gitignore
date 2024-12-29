@@ -22,8 +22,6 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-scripts/maps/*
-scripts/maps-clean/*
-!scripts/maps/.gitkeep
-!scripts/maps-clean/.gitkeep
+data/input-data/*
+!data/input-data/.gitkeep
 .Rhistory
