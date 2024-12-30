@@ -94,7 +94,7 @@
 		map.addControl(
 			new maplibregl.AttributionControl({
 				customAttribution:
-					'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">CC-BY 4.0 scne.es 2015-2021</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
+					'© <a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#">CC-BY 4.0 scne.es</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> © <a href="https://carto.com/attribution/#basemaps">CARTO</a>'
 			})
 		);
 
