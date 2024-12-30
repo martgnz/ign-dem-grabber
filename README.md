@@ -16,6 +16,8 @@ The instructions and scripts for obtaining and cleaning the data needed to run t
 
 IGN makes the rasters available under a [CC-BY compatible licence](https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf).
 
+Read the [data policy](https://centrodedescargas.cnig.es/CentroDescargas/politica-datos).
+
 ## Usage
 
 These are common GDAL commands you can use to work with this imagery. You can find more in [this cheatsheet](https://github.com/dwtkns/gdal-cheat-sheet).

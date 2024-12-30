@@ -2,6 +2,7 @@
 	import 'maplibre-gl/dist/maplibre-gl.css';
 
 	import { browser } from '$app/environment';
+	import { innerWidth } from 'svelte/reactivity/window';
 	import { onMount } from 'svelte';
 	import { csv, json } from 'd3-fetch';
 	import { selectAll } from 'd3-selection';
@@ -11,8 +12,7 @@
 	let { selected } = $props();
 
 	let mounted = $state(false);
-	let width = $state(0);
-	let isMobile = $derived(width < 600);
+	let isMobile = $derived(innerWidth < 600);
 
 	let container = $state(null);
 	let map = $state(null);
@@ -191,6 +191,7 @@
 			.setHTML(
 				`<div class="tip-container">
 				<div class="tip-title">${name}</div>
+				${tooltipRow({ name: 'Hoja', data: tile?.[0]?.id })}
 				${tooltipRow({ name: 'Fecha', data: date })}
 				${tooltipRow({ name: 'Tamaño', data: `${roundMb(+size)}MB` })}
 
@@ -250,8 +251,6 @@
 	};
 </script>
 
-<svelte:window bind:innerWidth={width} />
-
 <div id="map" bind:this={container}></div>
 
 <style>
@@ -276,6 +275,7 @@
 	#map :global(.tip-title) {
 		font-weight: 700;
 		font-size: 14px;
+		line-height: 1.2;
 		margin-bottom: 0.25rem;
 	}
 	#map :global(.tip-row) {

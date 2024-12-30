@@ -6,7 +6,6 @@
 		{
 			text: '2 metros',
 			value: 'MDT02',
-			note: 'Incompleto',
 			coverage: [{ text: '2ª cobertura (2015-2021)', value: 'COB2', tiles: 'MTN25' }]
 		},
 		{
@@ -32,7 +31,7 @@
 		}
 	];
 
-	let coverage = $state({ MDT02: 'COB2', MDT05: 'COB1', MDT25: 'COB2', MDT200: 'COB2' });
+	let coverage = $state({ MDT02: 'COB2', MDT05: 'COB1', MDT25: 'COB1', MDT200: 'COB1' });
 	let dem = $state('MDT05');
 
 	let selected = $derived({
@@ -47,8 +46,8 @@
 	<header>
 		<h1>Descarga modelos digitales <br /> de elevación del IGN</h1>
 		<div class="highlight">
-			Actualización 2024: descarga en formato GeoTIFF, soporte de múltiples coberturas y nuevas
-			hojas 2m.
+			Actualización 2024: descargas en formato GeoTIFF y resoluciones actualizadas con múltiples
+			coberturas.
 		</div>
 		<p class="desc">
 			Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
@@ -60,36 +59,54 @@
 		</p>
 
 		<div class="options">
-			<h2>Escoge la resolución</h2>
+			<details open>
+				<summary>Escoge la resolución</summary>
+				{#each options as option, idx}
+					<div class="radio">
+						<input
+							type="radio"
+							name="dem"
+							id={option.value}
+							value={option.value}
+							bind:group={dem}
+						/>
+						<label for={option.value}>
+							{option.text}
+							{#if option.note}<span class="note">({@html option.note})</span>{/if}
+							{#if option.value === 'MDT200' && coverage[option.value] === 'COB1'}
+								<span class="note">
+									<form
+										method="post"
+										id="form"
+										action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir"
+									>
+										<input type="hidden" name="secDescDirLA" value="11608426" />
+										<input type="hidden" name="codSerie" value="02109" />
+										<button type="submit">Hoja nacional</button>
+									</form>
+								</span>
+							{/if}
+						</label>
 
-			{#each options as option, idx}
-				<div class="radio">
-					<input type="radio" name="dem" id={option.value} value={option.value} bind:group={dem} />
-					<label for={option.value}>
-						{option.text}
-						{#if option.note}<span class="note">({option.note})</span>{/if}
-					</label>
-
-					<select bind:value={coverage[option.value]} disabled={option.coverage.length === 1}>
-						{#each option.coverage as d}
-							<option value={d.value}>{d.text}</option>
-						{/each}
-					</select>
-				</div>
-			{/each}
+						<select bind:value={coverage[option.value]} disabled={option.coverage.length === 1}>
+							{#each option.coverage as d}
+								<option value={d.value}>{d.text}</option>
+							{/each}
+						</select>
+					</div>
+				{/each}
+			</details>
 		</div>
 
 		<div class="info">
 			<p>
-				Datos en formato <a href="https://cogeo.org/">Cloud Optimized GeoTiff</a>. Licencia
-				<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf">CC-BY</a>.
+				Datos en formato <a href="https://cogeo.org/">Cloud Optimized GeoTiff</a>.
 			</p>
 			<p>
-				<a
-					href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/{selected.dem}_recursos.zip"
-				>
-					Descarga la referencia técnica
-				</a>.
+				Licencia de uso
+				<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
+					>CC-BY 4.0 scne.es</a
+				>.
 			</p>
 			<p>
 				Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber">GitHub</a>.
@@ -114,6 +131,17 @@
 		z-index: 1;
 		box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
 	}
+	@media (max-width: calc(740px - 1px)) {
+		header {
+			margin-left: auto;
+			margin-right: auto;
+			left: 0;
+			right: 0;
+		}
+	}
+	a {
+		color: black;
+	}
 	h1 {
 		color: #111;
 		font-size: 1.25rem;
@@ -123,15 +151,14 @@
 		padding-bottom: 0.5rem;
 		border-bottom: 1px solid #dfdfdf;
 	}
-	h2 {
+	.desc {
+		margin-bottom: 0;
+	}
+	details summary {
 		font-size: 1rem;
+		font-weight: 700;
 		margin: 0;
 		margin-bottom: 0.5rem;
-	}
-	a {
-		color: black;
-		/* text-decoration: none; */
-		/* border-bottom: 2px solid black; */
 	}
 	.radio {
 		display: flex;
@@ -149,7 +176,12 @@
 			padding-bottom: 0.5rem;
 		}
 	}
+	.radio input {
+		top: 1px;
+		position: relative;
+	}
 	label {
+		padding-left: 2px;
 		width: 100%;
 	}
 	.note {
@@ -157,22 +189,26 @@
 		font-weight: 300;
 		font-style: italic;
 	}
+	.note form button {
+		font-weight: 300;
+		font-style: italic;
+		cursor: pointer;
+		appearance: none;
+		background: none;
+		border: none;
+		text-decoration: underline;
+		margin: 0;
+		padding: 0;
+		padding-top: 2px;
+	}
 	.options {
-		margin-top: 1rem;
-		margin-bottom: 1rem;
+		margin-top: 10px;
+		margin-bottom: 10px;
 	}
 	.info p {
 		font-weight: 300;
 		font-size: 12px;
 		margin-bottom: 2px;
-	}
-	.desc {
-		display: none;
-	}
-	@media (min-width: 600px) {
-		.desc {
-			display: block;
-		}
 	}
 	.highlight {
 		display: inline-block;
