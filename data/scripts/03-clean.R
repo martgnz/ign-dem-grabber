@@ -4,7 +4,7 @@ library(tidyverse)
 
 # most files look like this
 clean_delimited <- function(file) {
-  df <- read_csv(file, col_names = c('filename', 'filetype', 'size', 'date')) %>%
+  df <- read_csv(file) %>%
     mutate(
       id = str_extract(filename, '\\d{4}(-\\d(-\\d)?)?'),
       # find either ETRS89, REGCAN95 or WGS84
@@ -23,31 +23,28 @@ clean_delimited <- function(file) {
         as.numeric(.),
       date = str_replace(date, ",$", "")
     ) %>% 
-    select(filename, id, datum, utm_zone, date, size)
+    select(id, download_id, series, datum, utm_zone, date, size)
 
   return(df)
 }
 
 # but this file is by provinces
 clean_mdt200_cob1 <- function(file) {
-  df <- read_csv(file,
-                 col_names = c('filename', 'filetype', 'size', 'date'),
-                 # make sure encoding works ok
-                 locale = locale(encoding = 'WINDOWS-1252')) %>% 
+  df <- read_csv(file) %>% 
     mutate(
       id = str_split(filename, '-') %>%
         map_chr(., 1) %>%
         str_trim(.),
       id = case_when(
-          id == 'Álava' ~ 'Araba/Álava',
-          id == 'Alicante/Alacant' ~ 'Alacant/Alicante',
-          id == "Balears, Illes" ~ "Illes Balears",
-          id == 'Castellón' ~ 'Castelló/Castellón',
-          id == 'Guipúzcoa' ~ 'Gipuzkoa',
-          id == 'Valencia' ~ 'València/Valencia',
-          id == 'Vizcaya' ~ 'Bizkaia',
-          TRUE ~ id
-        ),
+        id == 'Álava' ~ 'Araba/Álava',
+        id == 'Alicante/Alacant' ~ 'Alacant/Alicante',
+        id == "Balears, Illes" ~ "Illes Balears",
+        id == 'Castellón' ~ 'Castelló/Castellón',
+        id == 'Guipúzcoa' ~ 'Gipuzkoa',
+        id == 'Valencia' ~ 'València/Valencia',
+        id == 'Vizcaya' ~ 'Bizkaia',
+        TRUE ~ id
+      ),
       datum = case_when(
         id == 'Santa Cruz de Tenerife' ~ 'REGCAN95',
         id == 'Las Palmas' ~ 'REGCAN95',
@@ -58,7 +55,7 @@ clean_mdt200_cob1 <- function(file) {
       date = str_replace_all(date, ' - ', ', ') %>%
         str_replace(., ",$", "")
     ) %>% 
-    select(filename, id, datum, utm_zone, date, size)
+    select(id, download_id, series, datum, utm_zone, date, size)
 
   return(df)
 }

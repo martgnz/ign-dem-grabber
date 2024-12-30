@@ -51,7 +51,7 @@
 					return dataIds.has(d.properties.id);
 				})
 			});
-			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[selected.dem]]);
+			map.setFilter('dem-downloaded', ['in', 'id', ...downloaded[selected.dem]]);
 		}
 	});
 
@@ -201,7 +201,8 @@
 						method="post"
 						id="form"
 						action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir">
-						<input type="hidden" name="secuencialDescDir" value="${d.id}" />
+						<input type="hidden" name="secDescDirLA" value="${d.download_id}" />
+						<input type="hidden" name="codSerie" value="${d.series}" />
 						<button class="tip-download" type="submit">Descargar ${d.datum}${d.utm_zone !== 'NA' ? ` (UTM ${d.utm_zone})` : ''}</button>
 					</form>
 				`
@@ -216,15 +217,15 @@
 		// FIXME: is there a way to remove the listener once we click away?
 		const closeButton = document.querySelector('.maplibregl-popup-close-button');
 		closeButton.addEventListener('click', () => {
-			map.setFilter('dem-clicked', ['==', 'name', '']);
+			map.setFilter('dem-clicked', ['==', 'id', '']);
 		});
 
 		// colour clicked tiles
 		selectAll('.tip-download').on('click', () => {
-			map.setFilter('dem-clicked', ['==', 'name', '']);
+			map.setFilter('dem-clicked', ['==', 'id', '']);
 
-			downloaded[selected.dem].push(name);
-			map.setFilter('dem-downloaded', ['in', 'name', ...downloaded[selected.dem]]);
+			downloaded[selected.dem].push(id);
+			map.setFilter('dem-downloaded', ['in', 'id', ...downloaded[selected.dem]]);
 		});
 	};
 
