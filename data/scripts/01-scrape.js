@@ -89,12 +89,12 @@ const main = async ({ filename, series }) => {
 try {
 	// be patient, this takes a while
 	await main({ filename: 'MDT02_COB2', series: 'MDT02' });
-	// await main({ filename: 'MDT05_COB1', series: 'MDT05' });
-	// await main({ filename: 'MDT25_COB1', series: '02107' });
-	//
-	// await main({ filename: 'MDT25_COB2', series: 'T25C2' });
-	// await main({ filename: 'MDT200_COB1', series: '02109' });
-	// await main({ filename: 'MDT200_COB2', series: 'T2002' });
+	await main({ filename: 'MDT05_COB1', series: 'MDT05' });
+	await main({ filename: 'MDT25_COB1', series: '02107' });
+
+	await main({ filename: 'MDT25_COB2', series: 'T25C2' });
+	await main({ filename: 'MDT200_COB1', series: '02109' });
+	await main({ filename: 'MDT200_COB2', series: 'T2002' });
 } catch (error) {
 	console.error(error);
 }
