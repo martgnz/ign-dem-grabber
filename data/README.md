@@ -1,4 +1,4 @@
-# scripts
+# Data processing
 
 These scripts scrape, download and clean the data necessary to obtain elevation imagery in various resolutions from the [CNIG website](https://centrodedescargas.cnig.es/CentroDescargas/modelos-digitales-elevaciones#MDTER). The output is a set of CSV and TopoJSON files that live on the `/output-data` folder.
 
