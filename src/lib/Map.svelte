@@ -12,7 +12,7 @@
 	let { selected } = $props();
 
 	let mounted = $state(false);
-	let isMobile = $derived(innerWidth < 600);
+	let isMobile = $derived(innerWidth.current < 600);
 
 	let container = $state(null);
 	let map = $state(null);
@@ -62,9 +62,9 @@
 		// start map
 		map = new maplibregl.Map({
 			container: 'map',
-			center: isMobile ? [-4, 40] : [-6, 40],
-			zoom: isMobile ? 5 : 5.5,
-			minZoom: isMobile ? 5 : 5.5,
+			center: isMobile ? [-4, 45.5] : [-6, 40],
+			zoom: isMobile ? 4 : 5.5,
+			minZoom: isMobile ? 4 : 5.5,
 			maxZoom: 10,
 			// maxBounds: bounds,
 			attributionControl: false,

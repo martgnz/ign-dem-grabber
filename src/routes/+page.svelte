@@ -1,6 +1,7 @@
 <script>
 	import '../app.css';
 	import Map from '$lib/Map.svelte';
+	import { innerWidth } from 'svelte/reactivity/window';
 
 	const options = [
 		{
@@ -59,7 +60,7 @@
 		</p>
 
 		<div class="options">
-			<details open>
+			<details open={innerWidth.current < 740 ? false : true}>
 				<summary>Escoge la resolución</summary>
 				{#each options as option, idx}
 					<div class="radio">
@@ -155,6 +156,7 @@
 		margin-bottom: 0;
 	}
 	details summary {
+		cursor: pointer;
 		font-size: 1rem;
 		font-weight: 700;
 		margin: 0;
