@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Descarga modelos digitales de elevación</title>
-		<link rel="icon" href="https://martingonzalez.net/ign-dem-grabber/favicon.ico" />
+		<link rel="icon" href="./favicon.ico" />
 
 		<meta name="title" content="Descarga modelos digitales de elevación">
 		<meta name="description" content="Explora y descarga de forma sencilla los modelos digitales de elevación (DEM) del Instituto Geográfico Nacional en 2m, 5m, 25m y 200m de resolución">
@@ -22,84 +22,45 @@
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
-
-
-
-<link rel="modulepreload" href="/ign-dem-grabber/_app/start-5dc3f269.js">
-			<link rel="modulepreload" href="/ign-dem-grabber/_app/chunks/vendor-1e9c6aa1.js">
-			<link rel="modulepreload" href="/ign-dem-grabber/_app/chunks/preload-helper-9f12a5fd.js">
-			<link rel="modulepreload" href="/ign-dem-grabber/_app/pages/index.svelte-7aae7d54.js">
-			<link rel="stylesheet" href="/ign-dem-grabber/_app/assets/start-eff31346.css">
-			<link rel="stylesheet" href="/ign-dem-grabber/_app/assets/pages/index.svelte-6725a0a3.css">
-
-
-		<script type="module">
-			import { start } from "/ign-dem-grabber/_app/start-5dc3f269.js";
-			start({
-				target: document.querySelector("#svelte"),
-				paths: {"base":"/ign-dem-grabber","assets":"/ign-dem-grabber"},
-				session: {},
-				host: location.host,
-				route: true,
-				hydrate: {
-					status: 200,
-					error: null,
-					nodes: [
-						import("/ign-dem-grabber/_app/pages/index.svelte-7aae7d54.js")
-					],
-					page: {
-						host: location.host, // TODO this is redundant
-						path: "/",
-						query: new URLSearchParams(""),
-						params: {}
-					}
-				}
-			});
-		</script>
+		<link href="./_app/immutable/assets/2.Cqf0XM7X.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.j704aX8a.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/entry.DpyL1Crs.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/runtime.cxtTTt-R.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-client.D6WBOH5c.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.BTYAJR7W.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/render.CMGPUTP3.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/disclose-version.r22U0RSg.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/this.CSsdyASc.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.CJIoWrpg.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.dFUFV6FZ.js">
 	</head>
-	<body>
-		<div id="svelte">
-
-
-<main><header class="svelte-1m8yqa6"><h1 class="svelte-1m8yqa6">Descarga modelos digitales <br> de elevación</h1>
-<div class="highlight svelte-1m8yqa6">Actualización 2022: +1.000 nuevas teselas de 2m.</div>
-<p class="desc svelte-1m8yqa6">Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
-	por el
-	<a href="https://centrodedescargas.cnig.es/CentroDescargas/index.jsp#" class="svelte-1m8yqa6">Instituto Geográfico Nacional</a> a partir de datos LIDAR.
-</p>
-
-<div class="options svelte-1m8yqa6"><h2 class="svelte-1m8yqa6">Escoge la resolución</h2>
-
-	<div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT02" value="MDT02">
-			<label for="MDT02" class="svelte-1m8yqa6">2 metros</label>
-			<div class="note svelte-1m8yqa6">Cobertura incompleta</div>
-		</div><div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT05" value="MDT05" checked>
-			<label for="MDT05" class="svelte-1m8yqa6">5 metros</label>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[--><!----><!----><main><header class="svelte-1fd1lpk"><h1 class="svelte-1fd1lpk">Descarga modelos digitales <br> de elevación del IGN</h1> <div class="highlight svelte-1fd1lpk">Actualización 2024: descargas en formato GeoTIFF y resoluciones actualizadas con múltiples
+			coberturas.</div> <p class="desc svelte-1fd1lpk">Con este mapa puedes descargar fácilmente los modelos digitales de elevación (DEM) realizados
+			por el <a href="https://centrodedescargas.cnig.es/CentroDescargas/modelos-digitales-elevaciones#MDTER" class="svelte-1fd1lpk">Instituto Geográfico Nacional</a> a partir de datos LIDAR.</p> <div class="options svelte-1fd1lpk"><details open class="svelte-1fd1lpk"><summary class="svelte-1fd1lpk">Escoge la resolución</summary> <!--[--><div class="radio svelte-1fd1lpk"><input type="radio" name="dem" id="MDT02" value="MDT02" class="svelte-1fd1lpk"> <label for="MDT02" class="svelte-1fd1lpk">2 metros <!--[!--><!--]--> <!--[!--><!--]--></label> <select disabled><!--[--><option value="COB2">2ª cobertura (2015-2021)</option><!--]--></select></div><div class="radio svelte-1fd1lpk"><input type="radio" name="dem" id="MDT05" value="MDT05" checked class="svelte-1fd1lpk"> <label for="MDT05" class="svelte-1fd1lpk">5 metros <!--[!--><!--]--> <!--[!--><!--]--></label> <select disabled><!--[--><option value="COB1">1ª cobertura (2008-2015)</option><!--]--></select></div><div class="radio svelte-1fd1lpk"><input type="radio" name="dem" id="MDT25" value="MDT25" class="svelte-1fd1lpk"> <label for="MDT25" class="svelte-1fd1lpk">25 metros <!--[!--><!--]--> <!--[!--><!--]--></label> <select><!--[--><option value="COB1">1ª cobertura (2008-2015)</option><option value="COB2">2ª cobertura (2015-2021)</option><!--]--></select></div><div class="radio svelte-1fd1lpk"><input type="radio" name="dem" id="MDT200" value="MDT200" class="svelte-1fd1lpk"> <label for="MDT200" class="svelte-1fd1lpk">200 metros <!--[!--><!--]--> <!--[--><span class="note svelte-1fd1lpk"><form method="post" id="form" action="https://centrodedescargas.cnig.es/CentroDescargas/descargaDir" class="svelte-1fd1lpk"><input type="hidden" name="secDescDirLA" value="11608426" class="svelte-1fd1lpk"> <input type="hidden" name="codSerie" value="02109" class="svelte-1fd1lpk"> <button type="submit" class="svelte-1fd1lpk">Hoja nacional</button></form></span><!--]--></label> <select><!--[--><option value="COB1">1ª cobertura (2008-2016)</option><option value="COB2">2ª cobertura (2015-2021)</option><!--]--></select></div><!--]--></details></div> <div class="info svelte-1fd1lpk"><p class="svelte-1fd1lpk">Datos en formato <a href="https://cogeo.org/" class="svelte-1fd1lpk">Cloud Optimized GeoTiff</a>.</p> <p class="svelte-1fd1lpk">Licencia de uso <a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf" class="svelte-1fd1lpk">CC-BY 4.0 scne.es</a>.</p> <p class="svelte-1fd1lpk">Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber" class="svelte-1fd1lpk">GitHub</a>.</p></div></header> <div class="content"><div id="map" class="svelte-fxohov"></div><!----></div></main><!----><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
 			
-		</div><div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT25" value="MDT25">
-			<label for="MDT25" class="svelte-1m8yqa6">25 metros</label>
-			
-		</div><div class="radio svelte-1m8yqa6"><input type="radio" name="dem" id="MDT200" value="MDT200">
-			<label for="MDT200" class="svelte-1m8yqa6">200 metros</label>
-			
-		</div></div>
+			<script>
+				{
+					__sveltekit_1vjwpe = {
+						base: new URL(".", location).pathname.slice(0, -1),
+						assets: "/ign-dem-grabber"
+					};
 
-<div class="info svelte-1m8yqa6"><p class="svelte-1m8yqa6">Datos en formato <a href="https://gdal.org/drivers/raster/aaigrid.html#raster-aaigrid" class="svelte-1m8yqa6">ASCII Grid</a>
-		con
-		<a href="https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf" class="svelte-1m8yqa6">licencia CC-BY</a>.
-	</p>
-	<p class="svelte-1m8yqa6"><a href="https://centrodedescargas.cnig.es/CentroDescargas/documentos/MDT05_recursos.zip" class="svelte-1m8yqa6">Descarga la referencia técnica</a>.
-	</p>
-	<p class="svelte-1m8yqa6">Código fuente disponible en <a href="https://github.com/martgnz/ign-dem-grabber" class="svelte-1m8yqa6">GitHub</a>.
-	</p></div></header>
+					const element = document.currentScript.parentElement;
 
-	<div class="content">
-
-<div id="map" class="svelte-k3f1hq"></div></div></main>
-
-
-
-	
-</div>
+					Promise.all([
+						import("./_app/immutable/entry/start.j704aX8a.js"),
+						import("./_app/immutable/entry/app.BTYAJR7W.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
 	</body>
 </html>
